@@ -6,7 +6,7 @@ Python 从入门到深入
 梯过程。
 
 放在这里方便笔者和他人学习和参考。
-通过点击 `在readthedocs中显示当前文档 <https://pyhowto.readthedocs.io/en/latest/index.html>`_ 可以浏览该文档的最新版本。
+通过点击 `在readthedocs中显示当前文档 <https://pythonhowto.readthedocs.io/en/latest/index.html>`_ 可以浏览该文档的最新版本。
 
 .. toctree::
   :maxdepth: 2

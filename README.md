@@ -5,4 +5,4 @@
 
 放在这里方便笔者和他人学习和参考。该文档还在不断完善整理中......
 
-通过点击 [在readthedocs中显示当前文档](https://pyhowto.readthedocs.io/en/latest/index.html>) 可以浏览该文档的最新版本。
+通过点击 [在readthedocs中显示当前文档](https://pythonhowto.readthedocs.io/en/latest/index.html>) 可以浏览该文档的最新版本。
