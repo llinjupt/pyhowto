@@ -3,8 +3,9 @@
 
 参考书目
 -----------
-- 《python编程从入门到实践》
-- 《Python高性能编程》
+
+| [1] Eric Matthes，袁国忠(译).Python编程从入门到实践[M].北京:人民邮电出版社，2016
+| [2] Micha Gorelick，Ian Ozsvald，胡世杰，徐旭彬(译).Python高性能编程[M].北京:人民邮电出版社，2017
 
 RST语法参考
 ------------
