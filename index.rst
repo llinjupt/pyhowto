@@ -23,4 +23,5 @@ Python 从入门到深入
   time
   exception
   module
+  iterator
   appendix
