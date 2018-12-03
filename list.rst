@@ -209,6 +209,24 @@ zip() 方法结合类型转换，可以巧妙的把两个链表中的元素一�
   [4, 5]
   <class 'list'>
 
+字符串也可以使用索引直接访问，所有的序列类型均可以使用索引访问，索引访问的本质是对象实现了 __getitem__() 方法。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  class IndexTest:
+      def __getitem__(self, key):
+          return key
+      
+  it = IndexTest()
+  print(it['hello'])
+  print(it[1.1])
+  
+  >>>
+  hello
+  1.1
+
 切片取子列表
 ~~~~~~~~~~~~~~~~~
 
@@ -248,8 +266,31 @@ zip() 方法结合类型转换，可以巧妙的把两个链表中的元素一�
   >>>
   ['defg']
 
+枚举访问列表
+~~~~~~~~~~~~~~~~~
+
+enumerate()方法可以将列表转化为枚举对象，这样就很容易获得序列的编号。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  enumerate_obj = enumerate(['item0', 'item1', 'item2'])
+  for i, value in enumerate_obj:
+      print(i, value)
+
+  print(type(enumerate_obj))
+
+  >>>
+  0 item0
+  1 item1
+  2 item2
+  <class 'enumerate'>
+
+实际上，enumerate()方法可以将任意可迭代类型转化为枚举对象。
+
 列表统计
-------------------
+---------
 
 统计元素个数
 ~~~~~~~~~~~~~~~~~
