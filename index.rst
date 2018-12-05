@@ -24,4 +24,5 @@ Python 从入门到深入
   exception
   module
   iterator
+  decorator
   appendix
