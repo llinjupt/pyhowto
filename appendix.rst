@@ -6,9 +6,28 @@
 
 | [1] Eric Matthes，袁国忠(译).Python编程从入门到实践[M].北京:人民邮电出版社，2016
 | [2] Micha Gorelick，Ian Ozsvald，胡世杰，徐旭彬(译).Python高性能编程[M].北京:人民邮电出版社，2017
+| [3] Jake VanderPlas，陈俊杰，陈小莉(译).Python数据科学手册[M].北京:人民邮电出版社，2017
+| [4] Mark Lutz. Learning Python(5th Edtion) [M] O’reilly Media Inc Gravenstein Highway North，2013
+
+参考网站
+-----------
+- `Python官方文档 <https://docs.python.org>`_ 
+- `机器学习 <https://thepythonguru.com/top-5-machine-learning-libraries-in-python/#more-1948>`_
+- `2to3版本代码转换工具 <https://bitbucket.org/python_mirrors/2to3>`_
+- `Python公开课 <https://python123.io>`_
+- `tutorialspoint代码示例 <http://www.tutorialspoint.com/python>`_
+- `Python 代码编写规范 <https://pep8.org/>`_
+- `Unix教程 <https://www.unixtutorial.org/>`_
+- `Python快速入门LearnXinYminutes <https://learnxinyminutes.com/docs/python/>`_
+- `迭代和迭代器关系  <https://nvie.com/posts/iterators-vs-generators/>`_
+- `Python课程和测验 <https://www.programiz.com/>`_
 
 RST语法参考
 ------------
+
+| .. _my-reference-label0:
+|  :ref:`my-reference-label0`。
+| .. _nopara_decorator_class:
 
 .. admonition:: 注意
 
@@ -193,14 +212,3 @@ col 1  col 2
    with the first line, but they must be indented relative to the
    field name marker, and they must line up with each other.
 :Parameter i: integer
-
-参考网站
------------
-- `Python官方文档 <https://docs.python.org>`_ 
-- `机器学习 <https://thepythonguru.com/top-5-machine-learning-libraries-in-python/#more-1948>`_
-- `2to3版本代码转换工具 <https://bitbucket.org/python_mirrors/2to3>`_
-- `Python公开课 <https://python123.io>`_
-- `tutorialspoint代码示例 <http://www.tutorialspoint.com/python>`_
-- `Python 代码编写规范 <https://pep8.org/>`_
-- `Unix教程 <https://www.unixtutorial.org/>`_
-- `Python快速入门LearnXinYminutes <https://learnxinyminutes.com/docs/python/>`_

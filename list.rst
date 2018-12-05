@@ -209,24 +209,6 @@ zip() 方法结合类型转换，可以巧妙的把两个链表中的元素一�
   [4, 5]
   <class 'list'>
 
-字符串也可以使用索引直接访问，所有的序列类型均可以使用索引访问，索引访问的本质是对象实现了 __getitem__() 方法。
-
-.. code-block:: python
-  :linenos:
-  :lineno-start: 0
-  
-  class IndexTest:
-      def __getitem__(self, key):
-          return key
-      
-  it = IndexTest()
-  print(it['hello'])
-  print(it[1.1])
-  
-  >>>
-  hello
-  1.1
-
 切片取子列表
 ~~~~~~~~~~~~~~~~~
 
@@ -288,6 +270,60 @@ enumerate()方法可以将列表转化为枚举对象，这样就很容易获得
   <class 'enumerate'>
 
 实际上，enumerate()方法可以将任意可迭代类型转化为枚举对象。
+
+.. _index_loop_access:
+
+索引访问和循环
+----------------
+
+字符串可以使用索引直接访问，列表也可以，所有的序列类型均可以使用索引访问，索引访问的本质是对象实现了 __getitem__() 方法。
+
+这里实现一个可读写的字符串类型来分析通过下标进行读写的本质。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  class RWStr():
+      ## 一个可读写的字符串类
+      
+      def __init__(self, instr=''):
+          self.instr = instr
+          self.len = len(instr)
+  
+      def __setitem__(self, index, instr): # 实现写操作，支持字符和字符串插入
+          if index > self.len:
+              raise IndexError("list index out of range")
+  
+          tmpstr = self.instr[:index] + instr + self.instr[index:] 
+          self.instr = tmpstr
+          self.len = len(tmpstr)
+          print(self.len)
+  
+      def __getitem__(self, index):       # 读操作，支持索引和切片
+          if isinstance(index, int):
+              return self.instr[index]
+          elif isinstance(index, slice):
+              return self.instr[index]
+          else:
+              raise TypeError('Index must be int, not {}'.format(type(index).__name__))
+  
+  rwstr = RWStr("hello")
+  print(rwstr[0])
+  print(rwstr[1:5])
+  
+  rwstr[5] = " world!"
+  
+  for i in rwstr: 
+      print(i, end=' ')
+  
+  >>>
+  h
+  ello
+  12
+  h e l l o   w o r l d ! 
+
+通过示例，也可以看出，只要实现了 __getitem__() 方法，就可以通过循环语句进行迭代读取处理。__setitem__() 方法对应写操作。
 
 列表统计
 ---------
