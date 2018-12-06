@@ -1,7 +1,7 @@
 ﻿函数和装饰器
 ================
 
-特性和高阶函数
+函数特性
 ---------------
 
 函数是大部分高级编程语言的构成基础，本小结主要总结在 Python 中函数的一些特性和高阶函数。
@@ -186,10 +186,301 @@ test_args() 是一个可以接受任意多个参数的函数。由于参数处�
   from func0, 1
   from func0, 3
 
+高阶函数
+--------------------
+
+functools 模块提供了一系列的重量级函数，这些函数有一个特点，函数调用其他函数完成复杂功能，或把一个函数作为返回值，这类函数被称为高阶（Higher-order）函数。
+由于历史原因，多数高阶函数从内置函数中封装进 functools 模块，有些函数还没有，比如 map()。
+
+Python3.x 中对这些函数进行了功能扩展，它们可以处理可迭代对象，并返回可迭代对象，具有惰性计算的特点，参考 :ref:`lazy_evaluation` 。
+
+map
+~~~~~~~~~~~~~~
+
+::
+
+  map(func, *iterables) --> map object
+    Make an iterator that computes the function using arguments from
+    each of the iterables.  Stops when the shortest iterable is exhausted.  
+
+map() 根据传入的函数对指定迭代对象做迭代处理，这一行为很像数学概念中的映射。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  mapobj = map(str, [1, 2, 3])
+  print(type(mapobj))
+  print(mapobj is iter(mapobj))
+
+  print(list(mapobj))
+  
+  >>>
+  <class 'map'>
+  True
+  ['1', '2', '3']
+
+Python2.x 返回列表，Python3.x 则返回 map 对象，它是一个迭代器。这个改进具有重大的意义，可以用来处理无限序列。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  def uint_creater():
+      i = 0
+      while(True):
+          yield i
+          i += 1
+  
+  cube = map(lambda x: x * x * x, uint_creater())
+  for i in cube:
+      if i < 10000000000:
+          continue
+      if i > 10099999999:
+          break
+      print(i)
+
+  >>>
+  10007873875
+  10021812416
+  10035763893
+
+上面的示例用于查看特定范围内可以用来表示立方数的数，在范围是上百亿级别也和普通小数一样处理。可以应用在数论研究领域，比如进行质数的稀疏度分析。
+由于第二个参数可以是多个迭代对象，我们还可以对数据进行并行操作：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  funcs = [lambda x: x * x, lambda x: x * x * x]
+  map_func = lambda f: f(i)
+  for i in range(4):
+      print(list(map(map_func, funcs)))
+
+  >>>
+  [0, 0]
+  [1, 1]
+  [4, 8]
+
+如果的函数列表中的函数具有多个参数如何处理呢？ 只要改写传入函数的参数个数即可，这里计算列表中每个成对的元素的差与和：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  funcs = [lambda x, y: abs(x - y), lambda x, y: y + x]
+  map_func = lambda f: f(i[0], i[1])
+  
+  for i in [[1, 2], [3, 4]]:
+      value = map(map_func, funcs)
+      print(list(value))
+  
+  >>>
+  [1, 3]
+  [1, 7]
+
+如果传入的函数有多个参数，如何处理呢？根据函数参数个数，来传递多个参数序列。例如依次求 pow(2, 2)，pow(3, 3) 和 pow(4, 4) 的值：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  print(list(map(pow, [2, 3, 4], [2, 3, 4])))
+  
+  >>>
+  [4, 27, 256]
+
+map() 函数的本质等同于如下函数：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  def homo_map(func, seq):
+  	  result = []
+    	for x in seq: 
+    	    result.append(func(x))
+    	
+    	return result
+
+reduce
+~~~~~~~~~~~~~~
+
+reduce() 函数有两个参数，它把 function 计算结果结果继续和序列的下一个元素做累积计算。
+
+::
+
+  reduce(function, sequence[, initial]) -> value
+    Apply a function of two arguments cumulatively to the items of a sequence,
+    from left to right, so as to reduce the sequence to a single value.
+
+reduce() 的行为等价于： 
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  def homo_reduce(func, seq):
+      result = seq[0]
+      for next in seq[1:]:
+        result = func(result, next)
+      return result
+
+以下示例计算列表中所有数值的乘积。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  from functools import reduce
+  total = reduce((lambda x, y: x * y), [1, 2, 3, 4])
+  print(total)  
+  
+  >>>
+  24
+
+filter
+~~~~~~~~~~~~~
+
+::
+
+  filter(function or None, iterable) --> filter object
+    Return an iterator yielding those items of iterable for which function(item)
+    is true. If function is None, return the items that are true.
+
+filter() 方法与 map() 类似，和 map()不同的是，filter() 把传入的函数依次作用于每个元素，然后根据返回值的真假决定保留还是过滤掉该元素。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  def homo_filter(func, seq):
+  	  result = []
+    	for x in seq:
+          if func(x)
+          	result.append(x)
+      return result
+
+下面的示例用于过滤空字符串：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  strs = ['hello', ' ', 'world']
+  ret = filter(lambda x : not x.isspace(), strs)
+  print(type(ret))
+  print(ret == iter(ret))
+  print(list(ret))
+
+  >>>
+  <class 'filter'>
+  True
+  ['hello', 'world']
+
+filter() 返回值是一个 filter 对象，它也是一个迭代器。filter() 还可以用于求交集：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  a = [4, 0, 3, 5, 7]
+  b = [1, 5, 6, 7, 8]
+  print(list(filter(lambda x: x in a, b)))
+  
+  >>>
+  [5, 7]
+
+.. _sorted_func:
+
+sorted
+~~~~~~~~~~~~~~
+
+::
+
+  sorted(iterable, *, key=None, reverse=False) --> new sorted list
+    Return a new list containing all items from the iterable in ascending order.
+
+sorted() 相对于列表自带的排序函数 L.sort() 具有以下特点：
+
+- 将功能扩展到所有的可迭代对象。
+- L.sort 直接作用在列表上，无返回，sortd() 则返回新的排序列表。
+- sortd() 是稳定排序，且经过优化，排序速度更快。
+
+排序的本质在于对两个需要排序的元素进行大小的比较，来决定位置的先后，对于数字和字符串类型比较好判断。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  print(sorted([5, 2, 3, 1, 4]))
+  print(sorted((5, 2, 3, 1, 4)))
+  print(sorted({1: 'D', 2: 'B', 3: 'B', 4: 'E', 5: 'A'})) # 字典默认使用键名排序
+  
+  # sorted() 返回列表类型，用它对字符串排序，注意类型转换
+  print(''.join(sorted("hello")))
+  >>>
+  [1, 2, 3, 4, 5]
+  [1, 2, 3, 4, 5]
+  [1, 2, 3, 4, 5]
+  ehllo
+
+为 key 指定函数参数，该函数只能接受一个参数，它的返回值作为比较的关键字，比如忽略大小写排序：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  sorted_list = sorted("This is a test string from Andrew".split(), key=str.lower)
+  print(sorted_list)
+  
+  >>>
+  ['a', 'Andrew', 'from', 'is', 'string', 'test', 'This']
+
+对于复杂对象，我们可以把元素中的部分成员最为排序关键字：
+  
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  scores = {'John': 15, 'Bill': 18, 'Kent': 12}
+  new_scores = sorted(scores.items(), key=lambda x:x[1], reverse=True)
+  print(new_scores)
+  
+  >>>
+  [('Bill', 18), ('John', 15), ('Kent', 12)]
+
+由于字典默认以 key 来迭代，对字典进行排序时，第一个参数要使用 dict.items() 来转化为 dict_items 对象。
+
+如果要对自定义的类对象排序，可以选择某个对象成员，下面的示例使用年龄对学生进行排序：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  class Student():
+      def __init__(self, name, grade, age):
+          self.name = name
+          self.grade = grade
+          self.age = age
+      def __repr__(self):
+          return repr((self.name, self.grade, self.age))
+  
+  student_objects = [
+          Student('john', 'A', 15),
+          Student('jane', 'B', 12),
+          Student('dave', 'B', 10),
+      ]
+  
+  print(sorted(student_objects, key=lambda student: student.age))
+
+  >>>
+  [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]  
+
 作用域和闭包
 ---------------
 
-在程序设计中变量所能作用的范围被称为作用域（scope），在作用域内，该变量是有效的，可以被访问和使用的。
+在程序设计中变量所能作用的范围被称为作用域（scope），在作用域内，该变量是有效的，可以被访问和使用。
 
 在介绍 Python 的作用域之前，先看一个名为 globals() 的内建函数。它返回当前运行程序的所有全局变量，类型为字典。
 
@@ -1077,3 +1368,122 @@ functools 模块中的 wraps 可以帮助保留这些信息。functools.wraps �
 
 内置装饰器
 ~~~~~~~~~~~~~
+
+定义类静态方法
+````````````````
+
+``@staticmethod`` 装饰器将类中的方法装饰为静态方法，不需要创建类的实例，可以通过类名直接引用。实现函数功能与实例解绑。
+
+静态方法不会隐式传入参数，不需要传入 self ，类似一个普通函数，只是可以通过类名或者类对象来调用。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  class C():
+      @staticmethod
+      def static_method():
+          print("This is a static method!")
+
+  C.static_method()     # 类名直接调用
+
+  c = C()        
+  c.static_method()     # 类对象调用
+  
+  >>>
+  This is a static method!
+  This is a static method!
+
+定义类方法
+``````````````````````
+
+``@classmethod`` 装饰器用于定义类方法，类方法和类的静态方法非常相似，只是会隐式传入一个类参数
+。类方法被哪个类调用，就传入哪个类作为第一个参数进行操作。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  class C():
+      @classmethod
+      def class_method(cls):
+          print("This is ", cls)
+  
+  class B(C):
+    pass
+  
+  C.class_method()  # 类名直接调用
+  c = C()
+  c.class_method()  # 类对象调用
+  
+  B.class_method()  # 继承类调用
+  
+  >>>
+  This is  <class '__main__.C'>
+  This is  <class '__main__.C'>
+  This is  <class '__main__.B'>
+
+类方法属性化
+```````````````````
+
+::
+
+  property(fget=None, fset=None, fdel=None, doc=None) -> property attribute
+
+内置方法 property() 可以将类方法属性化，可以直接为成员赋值和读取，也可以定义只读属性。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  class C():
+      def __init__(self):
+          self.__arg = 0
+   
+      def getarg(self):
+          return self.__arg
+   
+      def setarg(self, value):
+          self.__arg = value
+   
+      def delarg(self):
+          del self.__arg
+   
+      arg = property(fget=getarg, fset=setarg, fdel=delarg, doc="'arg' property.")
+  
+  c = C()
+  c.arg = 10        # 调用 setarg
+  print(c.arg)      # 调用 getarg
+  
+  c.setarg(20)      # 调用 setarg
+  print(c.getarg()) # 调用 getarg
+  del c.arg         # 调用 delarg
+  
+如果不提供 fset 参数，则属性就变成只读的了。``@property`` 装饰器以更简单的方式实现了相同功能。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  class C():
+      def __init__(self):
+          self.__arg = 0
+      
+      @property
+      def argopt(self):
+          return self.__arg
+      
+      @argopt.setter
+      def argopt(self, value):
+          self.__arg = value
+      
+      @argopt.deleter
+      def argopt(self):
+          del self.__arg
+  
+  c = C()
+  c.arg = 10
+  print(c.arg)
+  del c.arg
+
+注意三个类方法的命名必须相同，getter（prorperty() 中名为 fget）对应的类方法总是用 "@property" 修饰，其他两个为方法名加上 ".setter" 和 ".deleter"，如果定义只读属性，不定义setter方法即可。
