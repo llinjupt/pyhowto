@@ -6,6 +6,45 @@
 
 函数是大部分高级编程语言的构成基础，本小结主要总结在 Python 中函数的一些特性和高阶函数。
 
+匿名函数
+~~~~~~~~~~~
+
+如果一个函数使用简单的表达式就可以实现所需功能，那么就无需显式定义一个函数，lamdba 表达式可以返回一个没有名字的函数，也即匿名函数。
+
+比如一些函数需要函数作为参数，那么直接使用 lambda 就很简便。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  homo_add = lambda x, y : x + y  # 定义匿名函数
+  print(type(homo_add))
+  print(homo_add(1, 2))
+  
+  >>>
+  <class 'function'>
+  3
+
+上面的匿名函数定义等价于：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  def homo_add(x, y):
+      return x + y
+
+把匿名函数赋值给变量 homo，所以它的类型是 function。通常在需要定义匿名函数的地方，直接使用 lambda 表达式即可，无需再给它一个名字：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  print(list(map(lambda x: x * x * x, [1, 2, 3, 4])))
+  
+  >>>
+  [1, 8, 27, 64]
+  
 函数参数类型
 ~~~~~~~~~~~~~
 
@@ -476,6 +515,157 @@ sorted() 相对于列表自带的排序函数 L.sort() 具有以下特点：
 
   >>>
   [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]  
+
+key 参数还可以指定 operator 模块提供的 itemgetter 和 attrgetter 方法。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+    
+  student_tuples = [ ('john', 'A', 15),
+                     ('jane', 'B', 12),
+                     ('dave', 'B', 10),]
+  print(sorted(student_tuples, key=lambda student: student[2])) # age 排序
+  
+  from operator import itemgetter, attrgetter
+  print(sorted(student_tuples, key=itemgetter(2))) # age 排序
+  print(sorted(student_objects, key=attrgetter('age'))) 
+  
+  print(sorted(student_tuples, key=itemgetter(1,2))) # 先以 grade 排序，再以 age 排序
+  print(sorted(student_objects, key=attrgetter('grade', 'age')))
+  
+  >>>
+  [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]
+  [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]
+  [('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]
+  [('john', 'A', 15), ('dave', 'B', 10), ('jane', 'B', 12)]
+  [('john', 'A', 15), ('dave', 'B', 10), ('jane', 'B', 12)]
+
+reverse 参数默认以升序排序，如果为 True 则以降序排序。更详细的介绍参考 `Python howto sorting <https://docs.python.org/3/howto/sorting.html>`_ 。
+
+partial
+~~~~~~~~
+
+::
+
+  partial(func, *args, **keywords) - new function with partial application
+          of the given arguments and keywords.
+
+
+一些函数提供多种参数，有时我们只需要改变其中的一些参数，而另一些参数只需要固定的值，那么每次都要把所有参数都补全是件繁琐的事情。
+partial() 方法可以将一个函数的参数固定，并返回一个新的函数。
+
+int()函数可以把字符串转换为整数，当仅传入字符串时，int()函数默认按十进制转换，其中有一个 base 参数可以指定转换的进制。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  print(int('123'))
+  print(int('123', base=8))
+  print(int('a', base=16))
+  print(int('101', base=2))
+
+如果要转换大量的十六进制字符串，每次都传入 base = 16 就很繁琐，为了简便可以想到定义一个 hexstr2int() 的函数，默认把 base = 16 传进去：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  def hexstr2int(x):
+      return int(x, base=16)
+  
+  print(hexstr2int('a'))
+  
+  >>>
+  10
+
+functools.partial() 方法可以直接创建一个这样的函数，而不需要自己定义 hexstr2int():
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  from functools import partial
+  hexstr2int = partial(int, base=16)
+  print(hexstr2int('a'))
+  
+  print(type(hexstr2int))
+  >>>
+  10
+  <class 'functools.partial'>
+
+注意到它返回的是一个 functools.partial 类型，而不是一个普通的函数，它等价于定义了一个如下的函数：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  def hexstr2int(x):
+      args = (x)
+      kwargs = {'base': 16}
+      
+      return int(*args, **kwargs)
+
+如果我们不使用关键字参数，而是直接使用值，那么将作为位置参数传递给 int()，例如：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  hexstr2int = partial(int, 'a')
+
+  #等价于
+  def hexstr2int(x):
+      args = ('a')
+      kwargs = {'base': x}
+      
+      return int(*args, **kwargs)
+
+如果一个函数有多个参数，那么就要区分这种参数的传递关系，我们看一个示例：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  def func(a, b, c, d):
+      print("a %d, b:%d c:%d, d:%d" %(a, b, c, d))
+      return a * 4 + b * 3 + c * 2 + d
+
+  part_func = partial(func, 1, d=4)
+  part_func(2, 3)
+  
+  part_func = partial(func, b=1, d=4)
+  part_func(2, c=3)
+  
+  part_func0 = partial(part_func, c=3) # 嵌套
+  part_func0(2)
+  
+  >>>
+  a 1, b:2 c:3, d:4
+  a 2, b:1 c:3, d:4
+  a 2, b:1 c:3, d:4
+
+有些内置函数只有位置参数，没有关键字参数，如何实现定制函数呢？以 divmod() 为例，如果我们固定第一个参数，这很容易。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  tendivmode = partial(divmod, 10)
+  
+如果要固定第二个参数，就需要把 divmod() 内置方法的位置参数重定义为支持关键字传入的参数。例如：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  def homo_divmod(a, b):
+    return divmod(a, b)
+  
+  divmod10 = partial(homo_divmod, b=10)
+
+使用 partial() 的目的是为简化代码，让代码简洁清晰，但也要注意到它的副作用，由于它返回 functools.partial 类型，隐藏了某些逻辑，比如新函数没有函数名，让跟踪更困难。
 
 作用域和闭包
 ---------------
