@@ -22,6 +22,7 @@
 - `迭代和迭代器关系  <https://nvie.com/posts/iterators-vs-generators/>`_
 - `Python课程和测验 <https://www.programiz.com/>`_
 - `Python Coding Samples <https://www.bogotobogo.com/python/pytut.php>`_
+- `Python 面试题 <https://www.bogotobogo.com/python/python_interview_questions.php>`_
 
 RST语法参考
 ------------
