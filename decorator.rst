@@ -1218,6 +1218,8 @@ nonlocal 声明
 
 类方法装饰如要需要传入参数，请参考含参装饰器，只要再封装一层即可。
 
+.. _decorator_class:
+
 装饰器类
 ~~~~~~~~~
 
@@ -1556,6 +1558,8 @@ functools 模块中的 wraps 可以帮助保留这些信息。functools.wraps �
 
 其实 functools.wraps 并没有彻底恢复所有函数信息，具体请参考第三方模块 wrapt。
 
+.. _buildin_decorator:
+
 内置装饰器
 ~~~~~~~~~~~~~
 
@@ -1613,14 +1617,16 @@ functools 模块中的 wraps 可以帮助保留这些信息。functools.wraps �
   This is  <class '__main__.C'>
   This is  <class '__main__.B'>
 
-类方法属性化
+.. _property_decorator:
+
+实例方法属性化
 ```````````````````
 
 ::
 
   property(fget=None, fset=None, fdel=None, doc=None) -> property attribute
 
-内置方法 property() 可以将类方法属性化，可以直接为成员赋值和读取，也可以定义只读属性。
+内置方法 property() 可以将类中定义的实例方法（对象方法）属性化，可以直接为成员赋值和读取，也可以定义只读属性。
 
 .. code-block:: python
   :linenos:
@@ -1676,4 +1682,4 @@ functools 模块中的 wraps 可以帮助保留这些信息。functools.wraps �
   print(c.arg)
   del c.arg
 
-注意三个类方法的命名必须相同，getter（prorperty() 中名为 fget）对应的类方法总是用 "@property" 修饰，其他两个为方法名加上 ".setter" 和 ".deleter"，如果定义只读属性，不定义setter方法即可。
+注意三个方法的命名必须相同，getter（prorperty() 中名为 fget）对应的方法总是用 "@property" 修饰，其他两个为方法名加上 ".setter" 和 ".deleter"，如果定义只读属性，不定义 setter 方法即可。

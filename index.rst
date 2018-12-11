@@ -21,6 +21,7 @@ Python 从入门到深入
   time
   exception
   module
+  object
   iterator
   decorator
   appendix

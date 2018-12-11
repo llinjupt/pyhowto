@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Python 从入门到深入'
-copyright = u'2017, Red Liu'
+copyright = u'2017, Red Liu. lli_njupt@163.com'
 author = u'Red Liu'
 
 # The version info for the project you're documenting, acts as replacement for

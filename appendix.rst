@@ -23,13 +23,15 @@
 - `Python课程和测验 <https://www.programiz.com/>`_
 - `Python Coding Samples <https://www.bogotobogo.com/python/pytut.php>`_
 - `Python 面试题 <https://www.bogotobogo.com/python/python_interview_questions.php>`_
-
+- `Python 内部实现 <https://eli.thegreenplace.net/tag/python-internals>`_
+ 
 RST语法参考
 ------------
 
 | .. _my-reference-label0:
-|  :ref:`my-reference-label0`。
+| :ref: `my-reference-label0` 。
 | .. _nopara_decorator_class:
+|
 
 .. admonition:: 注意
 

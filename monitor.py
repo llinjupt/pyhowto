@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # author Red liu
-# auto monitor one file changing to do make
+# monitor src files to do auto make
 
 import os, time, sys
 
 # get last modified time
-# input a file or a *.xxx
+# input a list of files
 def get_last_mtime(files):
   mtime = 0.0
 
@@ -22,7 +22,7 @@ def get_last_mtime(files):
 
 if __name__ == '__main__':
   if len(os.sys.argv) < 2:
-    print "Usage: monitor.py xxx.py or *.py"
+    print "Usage: monitor.py xxx.rst or *.rst"
     exit()
   
   mtime = 0.0
@@ -30,7 +30,7 @@ if __name__ == '__main__':
   while True:
     last_mtime = get_last_mtime(os.sys.argv[1:])
     if mtime != last_mtime:
-      print "----------------------------------------------------------"
+      print("-" * 30)
       os.system("make html")
       mtime = last_mtime
     

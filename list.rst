@@ -721,3 +721,197 @@ operator模块提供的比较函数是运算符的另一种表达形式，它们
   
   >>>
   True
+
+元组
+-------
+
+元组（Tuple）与列表类似，它使用() 表示，元组兼容列表中大部分操作，比如索引，切片等。唯一不同在于元素只读，不可更改。
+
+元组的运算
+~~~~~~~~~~~
+
+如果元组只有一个元素，那么一定要加上逗号，由于() 本身是一个运算符，将直接返回括号内的内容。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  print(type((1)))
+  print(type((1,)))
+
+  >>>
+  <class 'int'>
+  <class 'tuple'>
+
+我们可以定义空元组，也可以追加元组到当前元组，所以只读是其中元素不可被删除或者更改，而不是元组自身不可更改。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  tuple0 = ()
+  tuple0 += (1, 2, 3)
+  print(tuple0[0])
+  print(tuple0[0:2])
+  print(len(tuple0))
+  
+  >>>
+  1
+  (1, 2)
+  3
+
+可以将元组对象转换为其他类型：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  # 类型转换
+  print(str(tuple0))
+  print(list(tuple0))
+  
+  >>>
+  (1, 2, 3)
+  [1, 2, 3]
+
+同样元组支持重复运算和拼接运算：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  tuple0 *= 2            # 重复
+  print(tuple0)       
+  tuple1 = (4, 5)
+  
+  tuple0 += tuple1
+  print(tuple0)         # 拼接
+  
+  >>>
+  (1, 2, 3, 1, 2, 3)
+  (1, 2, 3, 1, 2, 3, 4, 5)
+  
+元组是可迭代对象，支持 for in 操作，也可以作为函数的可迭代对象实参：
+  
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  for i in tuple0:
+      print(i)
+
+  # 作为可迭代对象实参
+  print(sum(tuple0))
+
+不可更新元组元素的值：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  # 不支持的操作
+  tuple0[4] = 0
+  tuple0[0] = 5
+  tuple0 += (4) # 注意与 tuple0 += (4,) 的区别
+
+  # 指向新对象
+  tuple0 = tuple1
+  print(tuple0) 
+  
+  >>>
+  (4, 5)
+
+.. _namedtuple:
+
+命名元组
+~~~~~~~~~~
+
+Python 提供了 collections 模块，它对基本数据类型提供了强大的扩展，命名元组（namedtuple）是其中之一。
+
+namedtuple() 是一个工厂函数（Factory Function），它用于构造一个命名元组类。 这个类继承自 tuple，它用来创建元组类似的对象，对象拥有只读属性，这些属性有对应的名字，可以通过名字访问属性。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+    
+  from collections import namedtuple
+  
+  # Point 是一个类，第一个参数定义类名
+  Point = namedtuple('PointClass', ['x', 'y'])
+  print(Point.__name__)
+  # 实例化对象 p
+  p = Point(1, 2)
+  print(p)
+  
+  # 使用索引访问属性
+  print(p[0])
+  print(p[0] + p[1])
+  
+  # 使用属性名访问
+  print(p.x)
+  print(p.x + p.y)
+  
+  # 不可更改元素值
+  p.x = 5 
+  
+  >>>
+  PointClass
+  PointClass(x=1, y=2)
+  1
+  3
+  1
+  3
+  AttributeError: can't set attribute
+
+namedtuple() 的第一个参数定义类名，列表参数定义类的属性。 它返回的是一个类，我们可以继承它，来扩展对属性的操作。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  class Point(namedtuple('PointClass', ['x', 'y'])):
+      __slots__ = () # 禁止动态属性
+      @property      # 只读属性，求勾股数
+      def hypot(self):
+          return (self.x ** 2 + self.y ** 2) ** 0.5
+      def __str__(self):
+          return 'Point: x=%6.3f  y=%6.3f  hypot=%6.3f' % (self.x, self.y, self.hypot)
+  
+  for p in Point(3, 4), Point(14, 5/7):
+      print(p)
+
+  >>>
+  Point: x= 3.000  y= 4.000  hypot= 5.000
+  Point: x=14.000  y= 0.714  hypot=14.018
+
+我们要定义一个新类，只是在已有类上添加一些参数，那么定义一个子类就太复杂了，一个简单的方法可以调用类属性 Point._fields，它是一个元组类型。比如扩展 Point 类到三维空间：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  print(Point._fields)
+  print(type(Point._fields))
+  Point3D = namedtuple('Point3D', Point._fields + ('z',))
+ 
+  >>>
+  ('x', 'y')
+  <class 'tuple'>
+
+命名元组的类方法 _make() 可以接受一个序列对象，方便批量把数据转化为命名元组对象。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  Point3D = namedtuple("Point3D", Point._fields + ('z',))
+  datum = [[1,2,3], [4,5,6], [7,8,9]]
+  for i in map(Point3D._make, datum):
+      print(i)
+
+  >>>      
+  Point3D(x=1, y=2, z=3)
+  Point3D(x=4, y=5, z=6)
+  Point3D(x=7, y=8, z=9)
+  
+  
