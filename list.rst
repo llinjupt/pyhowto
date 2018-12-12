@@ -96,6 +96,20 @@ Python有多个序列的内置类型，但最常见的是列表和元组，很�
   ['b', 'd']
   ['ab.txt', 'cd.txt']  
 
+列表推导等价于如下过程：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  listb = ["ab", "cd"]
+  list2 = [x + ".txt" for x in listb]
+  
+  # 等价于  
+  list2 = []
+  for x in listb:
+      list2.append(x + ".txt")
+
 其他类型转换列表
 ~~~~~~~~~~~~~~~~~~~
 

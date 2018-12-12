@@ -136,9 +136,10 @@ zip()函数名副其实，它的作用很像拉链，将两个列表合并成一
 
 由列表生成定值字典
 ````````````````````
+::
 
-``D.fromkeys(iterable, value=None, /) method of builtins.type instance``
-    ``Returns a new dict with keys from iterable and values equal to value.``
+   D.fromkeys(iterable, value=None, /) method of builtins.type instance
+      Returns a new dict with keys from iterable and values equal to value.
 
 D.fromkeys() 方法支持从迭代对象取键，并可指定值的字典。通常使用列表或者元组作为参数。
 

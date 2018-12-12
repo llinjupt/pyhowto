@@ -24,7 +24,8 @@
 - `Python Coding Samples <https://www.bogotobogo.com/python/pytut.php>`_
 - `Python 面试题 <https://www.bogotobogo.com/python/python_interview_questions.php>`_
 - `Python 内部实现 <https://eli.thegreenplace.net/tag/python-internals>`_
- 
+- `graphviz 官方文档 <https://graphviz.org/documentation/>`_
+
 RST语法参考
 ------------
 
