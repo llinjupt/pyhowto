@@ -25,6 +25,8 @@
 - `Python 面试题 <https://www.bogotobogo.com/python/python_interview_questions.php>`_
 - `Python 内部实现 <https://eli.thegreenplace.net/tag/python-internals>`_
 - `graphviz 官方文档 <https://graphviz.org/documentation/>`_
+- `Python 进阶 <https://docs.pythontab.com/interpy/>`_
+- `Python 函数模块实例 <https://www.journaldev.com/python>`_
 
 RST语法参考
 ------------
