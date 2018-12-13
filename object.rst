@@ -448,6 +448,8 @@ Python 中还定义了一些常量，比如 True，False。其中有两个常量
   
   >>>
   This is a class static method
+
+类的静态方法无法访问类属性。
   
 查看类属性和方法
 ~~~~~~~~~~~~~~~~
@@ -1128,6 +1130,8 @@ Python 基本数据类型没有支持枚举，但是提供了 enum 模块。它�
 .. code-block:: python
   :linenos:
   :lineno-start: 0
+  
+  from enum import Enum
   
   Animal = Enum('Animal', 'ANT BEE CAT DOG')
   print(Animal.__name__)
