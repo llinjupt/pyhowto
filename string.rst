@@ -612,8 +612,7 @@ b、d、o、x/X 分别是二进制、十进制、八进制、十六进制。
 
 S.find(sub [,start [,end]]) -> int
 
-find() 在[start, end)范围内查找 sub 字符串，如果存在返回第一个的索引，否则
-返回-1。
+find() 在 [start, end) 索引范围内查找 sub 字符串，如果存在返回第一个的索引，否则返回-1。
 
 .. code-block:: python
   :linenos:
@@ -877,7 +876,8 @@ lstrip() 和 rstrip() 方法与strip()类似，只是只去除头部或者尾部
 
 S.partition(sep) -> (head, sep, tail)
 
-partition()方法用来根据指定的分隔符将字符串进行分割。
+partition()方法用来根据指定的分隔符将字符串进行分割，sep 若包含多个字符，则作为一个整体分割。
+
 rpartition()方法从右侧开始分割。
 
 如果字符串包含指定的分隔符，则返回一个3元的元组，
@@ -886,16 +886,18 @@ rpartition()方法从右侧开始分割。
 .. code-block:: python
   :linenos:
   :lineno-start: 0
-  
+
   str0 = "www.google.com"
   print(str0.partition("."))
   print(str0.rpartition("."))
-  print(str0.partition("1"))  # 如果没有则元组前两个元素为空字符
-  
+  print(str0.partition("1"))     # 如果没有则元组前两个元素为空字符
+  print(str0.partition("google"))# "google" 作为整体充当分割符
+
   >>>
   ('www', '.', 'google.com')
   ('www.google', '.', 'com')
   ('', '', 'www.google.com')
+  ('www.', 'google', '.com')
   
 字符串切片
 ~~~~~~~~~~~~~~
@@ -973,8 +975,7 @@ expandtabs() 方法把字符串中的水平制表符('\\t')转为空格，默认
 
 S.replace(old, new[, count]) -> string
 
-replace() 方法把字符串中的旧字符串 old 替换成新字符串 new，
-如果指定第三个参数 count，则替换不超过 count 次。
+replace() 方法把字符串中的旧字符串 old 替换成新字符串 new，如果指定第三个参数 count，则替换不超过 count 次。
 
 .. code-block:: python
   :linenos:
@@ -988,32 +989,85 @@ replace() 方法把字符串中的旧字符串 old 替换成新字符串 new，
   new new new new
   new new new old
 
-按照字符映射替换
-~~~~~~~~~~~~~~~~~
-
-S.translate(table [,deletechars]) -> string
-
-translate() 函数根据参数table给出的表(包含 256 个字符)转换字符串的字符, 
-要过滤掉的字符放到 deletechars 参数中。
+replace() 方法只能把参数作为一个整体进行替换，如果我们要替换字符串中的多个字符，可以借助 re 正则表达式模块。
 
 .. code-block:: python
   :linenos:
   :lineno-start: 0
   
-  # 引用 maketrans 函数
+  import re
+  
+  str0 = '\r\nhello 1213 \nworld'
+  print(re.sub('[\r\n\t23]', '', str0))
+  
+  >>>
+  hello 11 world
+
+字符映射替换
+~~~~~~~~~~~~~~
+
+::
+
+  S.translate(table [,deletechars]) -> string [Python2.x]
+  S.translate(table) -> str [Python3.x]
+
+translate() 函数根据参数 table 给出的转换表（它是一个长度为 256 的字符串）转换字符串的单个字符，要过滤掉的字符通过 deletechars 参数传入。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  # 引用 maketrans 函数生成转换表
   from string import maketrans
-     
-  intab  = "aeiou "
+
+  # intab 和 outtab 长度必须相同   
+  intab  = "aeiou+"
   outtab = "12345-"
-  trantab = maketrans(intab, outtab)
-   
-  str0 = "It is a abc song....wow!!!"
-  print(str0.translate(trantab, "!t"))
+  trantab = maketrans(intab, outtab) 
+
+  str0 = "aeiou+r1m"
+  print(str0.translate(trantab, "rm"))
+
+  # Python 3.x 版本不支持 deletechars
+  print(str0.translate(trantab))
 
   >>>
-  I-3s-1-1bc-s4ng....w4w
+  12345-1
+  12345-r1m
 
-translate() 只局限于单个字符的映射替换。
+translate() 只限于单个字符的映射替换。
+
+字符串映射替换
+~~~~~~~~~~~~~~~~~~~
+
+为了解决 translate() 方法单字符映射的限制，使用 re 功能可以无副作用的替换多个字符串。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  # count 表示替换的次数，默认替换所有
+  def replace_strs(instr, map_dict, count=0):
+      import re
+  
+      # escape all key strings
+      re_dict = dict((re.escape(i), j) for i, j in map_dict.items())
+      pattern = re.compile('|'.join(re_dict.keys()))
+      
+      return pattern.sub(lambda x: re_dict[re.escape(x.group(0))], instr, count)
+
+  str0 = "This and That."
+  map_dict = {'This' : 'That', 'That' : 'This'}
+  
+  print(replace_strs(str0, map_dict))
+
+  # 注意重复调用 replace() 方法带来的副作用
+  newstr = str0.replace('This', 'That').replace('That', 'This')
+  print(newstr)
+
+  >>>
+  That and This.
+  This and This.
 
 字符串排序
 --------------

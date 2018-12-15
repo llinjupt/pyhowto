@@ -28,6 +28,13 @@
 - `Python 进阶 <https://docs.pythontab.com/interpy/>`_
 - `Python 函数模块实例 <https://www.journaldev.com/python>`_
 
+作图资源
+-----------
+- `Graphviz 官网 <http://www.graphviz.org>`_
+- `Graphviz 示例1 <https://graphs.grevian.org/example>`_
+- `Graphviz 示例2 <https://renenyffenegger.ch/notes/tools/Graphviz/examples/index>`_
+- `Graphviz 示例3 <http://www.tonyballantyne.com/graphs.html>`_
+
 RST语法参考
 ------------
 

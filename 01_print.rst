@@ -123,7 +123,7 @@ print()函数支持一次输入多个打印字符串，默认以空格分割，�
       print("The door bursts open. A MAN and WOMAN enter, drunk and giggling,\
   horny as hell.No sooner is the door shut than they're all over each other,\
   ripping at clothes,pawing at flesh, mouths locked together.")
-  
+
   print_long_line()
   
   >>>
@@ -134,12 +134,22 @@ print()函数支持一次输入多个打印字符串，默认以空格分割，�
 如果 print() 函数要打印很长的数据，则可使用右斜杠将一行的语句分为多行进行编辑，编译器在执行时，
 将它们作为一行解释，注意右斜杠后不可有空格，且其后的行必须顶格，否则头部空格将被打印。
 
-如果一行的代码很长，也可以这样断行，让代码更美观，代码断行无需考虑顶格。
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  def print_long_line():
+      print("""The door bursts open. A MAN and WOMAN enter, drunk and giggling,
+  horny as hell.No sooner is the door shut than they're all over each other,
+  ripping at clothes,pawing at flesh, mouths locked together.""")
+
+使用一对三引号和上述代码是等价的，以上写法每行字符必须顶格，否则对齐空格将作为字符串内容被打印，这影响了代码的美观。
+  
 
 长行打印输出(2)
 -----------------
 
-上面的输出方式有一个缺点，代码必须顶格，否则作为偏移的空格将被打印输出。另一种方式是通过每行加引号。
+上面的输出方式有一个缺点，代码必须顶格，否则作为代码对齐的空格将被打印输出。可以为每行加引号来解决这个问题。
 
 .. code-block:: python
   :linenos:
