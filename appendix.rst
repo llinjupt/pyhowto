@@ -39,10 +39,12 @@ RST语法参考
 ------------
 
 | .. _my-reference-label0:
-| :ref: `my-reference-label0` 。
+| :ref:`my-reference-label0` 。
 | .. _nopara_decorator_class:
-|
+| :ref:`nopara_decorator_class` 
 
+
+ 
 .. admonition:: 注意
 
   任何对文件的读取和写入动作，都会自动改变文件的指针偏移位置。
