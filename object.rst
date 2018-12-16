@@ -403,7 +403,7 @@ Python 中还定义了一些常量，比如 True，False。其中有两个常量
   v1.0
   v1.1
 
-类的私有属性也可以被类的实例通过类方法访问或者修改类，但是修改过程不会出现拷贝，类私有属性在内存中永远只有一份，所有修改会影响到类和类的所有示例。
+类的私有属性也可以被类的实例通过类方法访问或者修改类，但是修改过程不会出现拷贝，类私有属性在内存中永远只有一份，所有修改会影响到类和类的所有实例。
 
 .. code-block:: python
   :linenos:
@@ -449,8 +449,33 @@ Python 中还定义了一些常量，比如 True，False。其中有两个常量
   >>>
   This is a class static method
 
-类的静态方法无法访问类属性。
+类的静态方法无法访问类属性。另外需注意，无论是类方法还是类的静态方法都只能通过类名加 '.' 的方式调用，不能间接调用它们，例如：
   
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  class Employee():
+      __class_version = "v1.0"
+      def __init__(self, id, name):
+          self.id = id
+          self.name = name
+  
+      @classmethod
+      def cls_ver_get(cls):
+          return cls.__class_version
+  
+      func_map = {'cls_ver_get':cls_ver_get}
+      
+      def call_func_map(self):
+          self.func_map['cls_ver_get']()
+      
+  worker0 = Employee(0, "John")
+  worker0.call_func_map()
+  
+  >>>
+  TypeError: 'classmethod' object is not callable
+
 查看类属性和方法
 ~~~~~~~~~~~~~~~~
 
