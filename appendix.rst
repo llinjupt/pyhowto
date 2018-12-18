@@ -35,6 +35,10 @@
 - `Graphviz 示例2 <https://renenyffenegger.ch/notes/tools/Graphviz/examples/index>`_
 - `Graphviz 示例3 <http://www.tonyballantyne.com/graphs.html>`_
 
+正则表达式
+--------------
+- `正则表达式 <http://deerchao.net/>`_
+
 RST语法参考
 ------------
 
@@ -43,7 +47,12 @@ RST语法参考
 | .. _nopara_decorator_class:
 | :ref:`nopara_decorator_class` 
 
+.. figure:: imgs/obj.png
+  :scale: 100%
+  :align: center
+  :alt: DAG
 
+  object 和 type 关系图 （实线表继承关系，虚线表实例关系 Shalabh Chaturvedi）
  
 .. admonition:: 注意
 
