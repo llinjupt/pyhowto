@@ -1634,3 +1634,85 @@ rotate(n) 方法对元素进行旋转操作，n < 0 向左旋转 n 次，n > 0 �
 ChainMap
 ~~~~~~~~~~~~
 
+ChainMap 将多个字典串联起来，按照参数顺序搜索键，找到即返回。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  from collections import ChainMap
+  
+  first = {'x': 1, 'y': 1}
+  second = {'y': 2, 'z': 2}
+  
+  cmap = ChainMap(first, second)
+  print(cmap)
+  for i, j in cmap.items():
+      print(i, '=', j)
+  
+  >>>
+  y = 1
+  z = 2
+  x = 1
+
+ChainMap 并不对字典进行拷贝，而是指向原字典。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  print(id(first['x']), id(cmap['x']))
+  
+  >>>
+  1531505776 1531505776
+
+如果修改键值将作用在第一个字典上，即便其他字典存在该键，依然会作用在第一个字典上。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  cmap['a'] = 1
+  cmap['z'] = 3  # second 存在 'z'，依然会添加到 first
+  print(cmap.maps)
+  print(first)
+
+  >>>
+  [{'x': 1, 'y': 1, 'a': 1, 'z': 3}, {'y': 2, 'z': 2}]
+  {'x': 1, 'y': 1, 'a': 1, 'z': 3}
+
+maps
+`````````````````
+
+maps 属性以元组形式返回所有字典：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  first = {'x': 1, 'y': 1}
+  second = {'y': 2, 'z': 2}
+  
+  cmap = ChainMap(first, second)
+  print(cmap.maps)
+  
+  >>>
+  [{'x': 1, 'y': 1}, {'y': 2, 'z': 2}]
+
+new_child
+`````````````````
+
+new_child() 方法创建新的 ChainMap 对象，可以传入新加入的字典。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  three = {'a' : 0}
+  new_cmap = cmap.new_child(three)
+  print(new_cmap.maps)
+  print(id(cmap.maps[0]), id(new_cmap.maps[1]))
+  
+  >>>
+  [{'a': 0}, {'x': 1, 'y': 1}, {'y': 2, 'z': 2}]
+  2101860273536 2101860273536
