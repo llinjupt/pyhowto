@@ -1692,7 +1692,7 @@ maps 属性以元组形式返回所有字典：
   
   first = {'x': 1, 'y': 1}
   second = {'y': 2, 'z': 2}
-  
+
   cmap = ChainMap(first, second)
   print(cmap.maps)
   
@@ -1702,12 +1702,14 @@ maps 属性以元组形式返回所有字典：
 new_child
 `````````````````
 
-new_child() 方法创建新的 ChainMap 对象，可以传入新加入的字典。
+new_child() 方法基于已经存在的 ChainMap 对象返回新创建的 ChainMap 对象，可以传入需要新加入的字典，如果不提供参数，则加入空字典 {}。
+
+注意新加入的字典优先级最高。
 
 .. code-block:: python
   :linenos:
   :lineno-start: 0
-  
+
   three = {'a' : 0}
   new_cmap = cmap.new_child(three)
   print(new_cmap.maps)
@@ -1716,3 +1718,321 @@ new_child() 方法创建新的 ChainMap 对象，可以传入新加入的字典�
   >>>
   [{'a': 0}, {'x': 1, 'y': 1}, {'y': 2, 'z': 2}]
   2101860273536 2101860273536
+
+struct
+---------
+
+struct 模块用来实现 bytes 和其他数据类型的转换，本质上类似 C 语言中的结构体，尝试把多个数据类型打包（格式化）到一个结构体中，这个结构体用 bytes 字节序列表示。
+
+在 C 语言中我们可以通过指针类型转换，轻易的访问任何合法地址的任何一个字节，在 Python 中不支持对地址访问，所以也不能轻易访问到一个对象的任意字节。
+
+Python 尽管提供的了 bytes 类，参考 :ref:`bytes` ，可以把字符串，可迭代整数类型等转换为 bytes 对象，但是却不能将任意一个整数转换为 bytes 对象，更无法对 float 等其他数据类型进行转换。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  bytes0 = bytes([0x123456])
+  
+  >>>
+  ValueError: bytes must be in range(0, 256)
+ 
+尽管可以使用如下讨巧的方式转换一个整形，但是却不通用。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  int0 = 0x12345678
+  hexstr = hex(int0)
+  bytes0 = bytes.fromhex(hexstr[2:])
+  print(bytes0)
+  
+  >>>
+  b'\x124Vx'
+ 
+struct 模块可以把任意基本数据类型和 bytes 互相转换，这样就可以使用 python 操作一些二进制文件，比如图片。
+
+pack
+~~~~~~~~~~~~~~ 
+
+pack() 方法通过格式化参数将给定的数据类型转换为 bytes 类型，也即打包成一个 bytes 类型的 struct 对象：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  import struct
+  sp0 = struct.pack('>I', 0x01020304)
+  print(type(sp0).__name__)
+  print(sp0)
+
+  >>>
+  bytes
+  b'\x01\x02\x03\x04'
+
+第一个参数 '>I' 是格式化字符串，其中 > 表示使用大端字节序，I 表示4字节无符号整数。这里采用大端字节序，转换后的结果高位 0x01 在前。
+
+格式化字符串
+~~~~~~~~~~~~~~~
+
+struct 的格式化字符串由两部分组成：字节序和数据类型，字节序是可选项，默认为 @ 。
+
+字节序支持如下几种模式：
+
+- @：本机字节序，进行数据对齐，填充 0 进行对齐，比如 int 型总是对齐到 sizeof(int)（通常为 4）整数倍的地址。
+- =：本机字节序，不对齐。
+- <：小端字节序，不对齐。
+- > 或 !：大端字节序（网络字节序），不对齐。
+
+可以这样获取本机系统的字节序：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  import sys
+  print(sys.byteorder)
+  
+  >>>
+  little
+
+支持的数据类型缩写参考 `struct 支持的数据类型字符 <https://docs.python.org/3/library/struct.html#format-characters>`_ 。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  fmts = ['ci', '>ci', '<ci']
+  for i in fmts:
+      sp0 = struct.pack(i, b'*', 0x12131415)
+      print('%s\t:' % i, sp0)
+  
+  >>>
+  ci      : b'*\x00\x00\x00\x15\x14\x13\x12' # 等价于 @ci 
+  >ci     : b'*\x12\x13\x14\x15'
+  <ci     : b'*\x15\x14\x13\x12'
+
+可以看出默认的 @ 模式会进行数据的对齐，i 表示 int 类型，由于字符 '*' 占用了 1 个地址，所以填充了 3 个 0 使得后边的 int 对齐到位置 4。
+
+格式化字符串 'ci' 等价于 C 语言中结构体：
+
+.. code-block:: c
+  :linenos:
+  :lineno-start: 0
+  
+  struct ci
+  {
+      char  c; 
+      int   i;
+  };
+
+calcsize() 方法可以计算格式化字符对应的对齐后字节大小。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  print(struct.calcsize('ci'))
+  print(struct.calcsize('>ci'))
+  
+  >>>
+  8
+  5
+
+如果要格式化的参数有多个是连续类型的，例如 10 个连续的字符类型，那么无需写成 10个重复的 c，而直接用 10c 表示：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  sp0 = struct.pack('2c2i', b'*', b',', 0x12, 0x13)
+  print(sp0)
+    
+  >>>
+  b'*,\x00\x00\x12\x00\x00\x00\x13\x00\x00\x00'
+
+在默认对齐方式下，我们可以指定尾部对齐到的类型，比如 '0l' 表示对齐到 long int 型。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0  
+
+  sp0 = struct.pack('llh0l', 1, 2, 3)
+  print(sp0)
+
+  >>>
+  b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
+
+也可以把多个要转换的对象放在元组里面，通过可变参数传递：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0  
+    
+  values = (b'*', 3.14, 'ab'.encode('utf-8'))
+  s = struct.Struct('c f s') # 空格用于分隔各个格式化字符，被忽略
+  sp0 = s.pack(*values)
+  print(sp0)
+  
+  >>>
+  b'*\x00\x00\x00\xc3\xf5H@a'
+
+unpack
+~~~~~~~~~~~
+
+unpack() 是 pack() 的逆运算，进行解包处理。结果以元组形式返回。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0  
+  
+  sp0 = struct.pack('lch0l', 1, b'*', 3)
+  up0 = struct.unpack('lch0l', sp0)
+  print(up0)
+  
+  >>>
+  (1, b'*', 3)
+
+如果 unpack 与 pack 使用的格式化串不一致，会抛出异常 struct.error。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  sp0 = struct.pack('lch0l', 1, b'*', 3)
+  up0 = struct.unpack('llh', sp0)
+  
+  >>>
+  error: unpack requires a bytes object of length 10
+
+使用 buffer
+~~~~~~~~~~~~~~~~~
+
+::
+
+  pack_into(fmt, buffer, offset, v1, v2, ...)
+  unpack_from(fmt, buffer, offset=0) -> (v1, v2, ...)
+
+pack_into() 向 buffer[offset] 中打包，unpack_from() 从 buffer[offset] 中解包。注意偏移参数指定了打包写入或者解包读取的位置。
+  
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  values0 = (b'abc', 3.1415926)
+  values1 = (b'zyz', 0x12)
+  
+  s0 = struct.Struct('3sf')
+  s1 = struct.Struct('3sI')
+  
+  buffer = bytearray(s0.size + s1.size)
+  print(buffer)
+  s0.pack_into(buffer, 0, *values0)
+  s1.pack_into(buffer, s0.size, *values1)
+  print(buffer)
+  print(s0.unpack_from(buffer, 0))
+  print(s1.unpack_from(buffer, s0.size))
+
+  >>>
+  bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+  bytearray(b'abc\x00\xda\x0fI@xyz\x00\x12\x00\x00\x00')
+  (b'abc', 3.141592502593994)
+  (b'xyz', 18)
+
+读取 bmp 头部
+~~~~~~~~~~~~~~~~
+
+一个用 C 语言定义的结构体 bmp_header 描述了一张 bmp 格式的图片头部，转化为 struct 的格式化字符串为 '2sIHHI'。
+
+.. code-block:: c
+  :linenos:
+  :lineno-start: 0 
+  
+  struct bmp_header{
+     char  id[2];                 /* 'BM'  */
+     unsigned int size;           /* 文件大小，单位 bytes     */
+     unsigned short int reserved1, reserved2;
+     unsigned int offset;         /* 图像数据偏移，单位 bytes */
+  };
+
+我们使用 '2sIHHI' 进行 unpack 操作：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  with open('test.bmp', 'rb') as f:
+      header = f.read(struct.calcsize('<2sIHHI'))
+      data = struct.unpack('<2sIHHI', header)
+      print(data)
+  
+  >>>
+  (b'BM', 1214782, 0, 0, 62)
+
+注意 bmp 文件采用小端字节序存储，解读出来的文件大小为 1214782 bytes，与实际相符。
+
+pickle
+-----------------
+
+有时候我们需要把 Python 对象存储到文件中，以便下次直接使用，而不用再重新生成它，比如机器学习中训练好的模型。或者我们需要在网络中传递一个 Python 对象以进行协同计算，这就需要对 Python 进行字节序列化。
+
+pickle 可以把大部分 Python 数据类型，例如列表，元组和字典，甚至函数，类和对象（只可本地保存和加载，  参考官方 `pickle 协议 <https://docs.python.org/3/library/pickle.html?highlight=pickle#pickle-protocols>`_ ）进行序列化。
+
+导出到文件
+~~~~~~~~~~~~~~~~~~~
+
+pickle.dump() 方法将对象导出到文件，pickle.load() 加载对象。可以同时序列化多个对象，加载时顺序与写入时顺序一致。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  list0 = [1, 2, 3]
+  tuple0 = ('a', 'b', 'c')
+  with open('obj.txt','wb') as fw:  
+      pickle.dump(list0, fw)   
+      pickle.dump(tuple0, fw)  
+  
+  with open('obj.txt','rb') as fr:  
+      rlist = pickle.load(fr)  
+      print(rlist)  
+      rtuple = pickle.load(fr)  
+      print(rtuple) 
+  
+  >>>
+  [1, 2, 3]
+  ('a', 'b', 'c')
+
+生成字节序列
+~~~~~~~~~~~~~~~~~~~~~
+
+pickle.dumps() 将对象转化为一个字节序列，pickle.loads() 将序列转换回对象：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  list0 = [1, 2, 3]
+  p = pickle.dumps(list0)
+  print(type(p).__name__)
+  print(p)
+  
+  list0 = pickle.loads(p)
+  print(list0)
+  
+  >>>
+  bytes
+  b'\x80\x03]q\x00(K\x01K\x02K\x03e.'
+  [1, 2, 3]
+
+hashlib
+------------------
+
+Hash 算法又称为散列算法。通过它可以把任意长度的输入变换成固定长度的输出，该输出就是哈希值，或者散列值。这种转换是一种压缩映射，散列值的空间通常远小于输入的空间，而对于给定的散列值，没有实用的方法可以计算出一个原始输入，也就是说很难伪造，所以常常把散列值用来做信息摘要（Message Digest）。
+
+hashlib 提供了多种常见的摘要算法，如 md5，sha，blake等。
+
+md5
+~~~~~~~~~~~~~
+
