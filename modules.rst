@@ -1977,7 +1977,7 @@ pickle
 
 有时候我们需要把 Python 对象存储到文件中，以便下次直接使用，而不用再重新生成它，比如机器学习中训练好的模型。或者我们需要在网络中传递一个 Python 对象以进行协同计算，这就需要对 Python 进行字节序列化。
 
-pickle 可以把大部分 Python 数据类型，例如列表，元组和字典，甚至函数，类和对象（只可本地保存和加载，  参考官方 `pickle 协议 <https://docs.python.org/3/library/pickle.html?highlight=pickle#pickle-protocols>`_ ）进行序列化。
+pickle 可以把大部分 Python 数据类型，例如列表，元组和字典，甚至函数，类和对象（只可本地保存和加载，  参考官方 `pickle 协议 <https://docs.python.org/3/library/pickle.html?highlight=pickle#pickle-protocols>`_ ）进行序列化。如果要在不同版本的 Python 间共享对象数据，需要注意转换协议的版本，可以在 dump() 和 dumps() 方法中指定，默认版本 3 只适用于 Python3。
 
 导出到文件
 ~~~~~~~~~~~~~~~~~~~
@@ -2031,8 +2031,142 @@ hashlib
 
 Hash 算法又称为散列算法。通过它可以把任意长度的输入变换成固定长度的输出，该输出就是哈希值，或者散列值。这种转换是一种压缩映射，散列值的空间通常远小于输入的空间，而对于给定的散列值，没有实用的方法可以计算出一个原始输入，也就是说很难伪造，所以常常把散列值用来做信息摘要（Message Digest）。
 
+散列算法有两个显著特点：
+
+1. 原始数据的微小变化（比如一个 1bit 翻转）会导致结果产生巨大差距。
+2. 运算过程不可逆，理论上无法从结果还原输入数据。
+
 hashlib 提供了多种常见的摘要算法，如 md5，sha，blake等。
 
 md5
 ~~~~~~~~~~~~~
 
+md5 是最常见的摘要算法，速度快，生成结果是固定的 128 bits，通常用一个32位的16进制字符串表示。
+
+digest() 返回 bytes 字节序列类型，hexdigest() 则直接返回 16 进制的字符串。传入参数必须是 bytes 类型。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  import hashlib
+  
+  md5 = hashlib.md5()
+  md5.update('你好 Python'.encode('utf-8'))
+  print(md5.digest())
+  print(md5.hexdigest())
+  
+  >>>
+  b'\x888]P\x8fT[\x83\x1aCj\x80\xad$\x14\x19'
+  88385d508f545b831a436a80ad241419
+
+
+如果需要计算的数据非常大，那么可以循环调用 update() 方法，例如下面的示例：
+
+  md5 = hashlib.md5()
+  md5.update('你好 '.encode('utf-8'))
+  md5.update(b'Python')
+  print(md5.hexdigest())
+  
+  >>>
+  88385d508f545b831a436a80ad241419
+  
+计算结果与上面的例子是一样的，所以在进行新的数据散列计算时，需要重新生成 md5 对象。
+
+sha1 和 sha2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+sha 是英文 Secure Hash Algorithm 的缩写，简称为安全散列算法。
+
+sha1 和 md5 均由 md4 发展而来，sha1 摘要比 md5 摘要长 32 bits，所以抗攻击性更强。sha224 等是 sha1 的加强版本，其中数字表示生成摘要的 bits，换算为结果的长度为 x/8*2。sha1 命名比较特殊，实际上它就是 sha160，摘要长度为 160/8*2 = 40 个字符。 
+
+sha224，sha256，sha384 和 sha512 被称为 sha2 算法。
+
+通常信息摘要的结果越长，冲突碰撞越不易发生，安全性越高，生成的速度也越慢，当然占用的存储空间也越大。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  shas = ['sha1', 'sha224', 'sha256', 'sha384', 'sha512']
+  for i in shas:
+      sha = eval('hashlib.' + i + '()')
+      sha.update('你好 Python'.encode('utf-8'))
+      print('%s(%d)\t:' % (i, len(sha.hexdigest())), sha.hexdigest())
+  
+  >>>
+  sha1(40)        : 8ee264aee7e58f2e680587eacd9535d81e1c07fd
+  sha224(56)      : 8ecbd4ea2e3037db9952f6e8e1df2e1e142d9756e0e26d2825e60757
+  sha256(64)      : d87357274f3e88a5b2473719f15db8804ae8b4737f75b4f05c6dc2b0d8c8ae80
+  sha384(96)      : c8254f627ae7de62c2ab8e94807af30c90ee01169f41e33ec0c90f808535bdd33
+                    a8b89d44c6f790b298622f35e078dff
+  sha512(128)     : 6a3cb3ae283d3491310dde804d196849f2acce6ecaa34156ac9d08e6b2c33e557
+                  : a319d507dbdbf05e8d3c7ea7c6308a3c60303921f68701b768d2982752dd8f4
+
+sha3
+~~~~~~~~~~~~~
+
+鉴于 sha-1 和 sha-2 潜在的安全性问题，sha3 采用了全新的 Keccak 算法，运算更快，安全性更高。它 sha2 系列算法一样，提供了不同版本。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  shas = ['sha3_224', 'sha3_256', 'sha3_384', 'sha3_512']
+  for i in shas:
+      sha = eval('hashlib.' + i + '()')
+      sha.update('你好 Python'.encode('utf-8'))
+      print('%s(%d)\t:' % (i, len(sha.hexdigest())), sha.hexdigest())
+  
+  sha3_224(56)    : b1ab601916f7663941fab552dadb19b73a879bf0a37a5664a80a3f26
+  sha3_256(64)    : 7e2329a2dc0e4f64ea93e35cb99319c6cf06b2c5ead6d61e1e77a9164be6cae5
+  sha3_384(96)    : 77172e65b6de373864915a874ba927ecda4fb5cab9e9c8c7dde50d4e3fc4f88a
+                    9f6bb9601e268f5cf183eb6f3e94a3ad
+  sha3_512(128)   : ec23b19dddb658d53d9bb4166c6b1958b2b55293a8d2155bdd05e8644af5ade6
+                    cdf7a0d2d58ab9c22c3ccac995b1e9be8d0c71ca60b9b362a38a7d109bb36121
+
+blake2
+~~~~~~~~
+
+随着硬件计算能力的提升，对 md5 和 sha1 进行伪造原始数据已不再十分困难，blake2 就是为了迎接这一挑战而出现的。
+
+blake2 系列比常见的 md5，sha1，sha2 和 sha3 运算更快，同时提供不低于 sha3 的安全性。blake2 系列从著名的 ChaCha 算法衍生而来，有两个主要版本 blake2b（blake2）和 blake2s 。
+
+- blake2b 针对 64 位 CPU 优化设计，可以生成最长 64 字节的摘要。
+- blake2s 针对 32 位 CPU 设计，可以生成最长 32 字节的摘要。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  blake2 = ['blake2b', 'blake2s']
+  for i in blake2:
+      blake = eval('hashlib.' + i + '()')
+      blake.update('你好 Python'.encode('utf-8'))
+      print('%s(%d)\t:' % (i, len(blake.hexdigest())), blake.hexdigest())
+  
+  >>>
+  blake2b(128)    : 182359731af5836fbcffc536defd712acf4fbcfa4065186b40b13c4945602cf0
+                    709c4c44b4ad287be1b3b4e7af907b6e43eff442cd756328344eaeeb4a0eda9d
+  blake2s(64)     : f3b98aeb02a459a950427a4c22fd6a669dde484eeae0f493c2ea51c909e63065
+
+shake
+~~~~~~~~~~
+
+shake128 和 shake256 算法是支持可变长度的信息摘要算法，可输出不大于 128 或 256 的任意比特数。
+
+Python 中通过 hexdigest(n) 传递参数 n 指定输出的字节数。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  shas = ['shake_128', 'shake_256']
+  for i in shas:
+      sha = eval('hashlib.' + i + '()')
+      sha.update('你好 Python'.encode('utf-8'))
+      print('%s(%d)\t:' % (i, len(sha.hexdigest(10))), sha.hexdigest(10))
+  
+  >>>
+  shake_128(20)   : 72877ec8143a659e8002
+  shake_256(20)   : c4118461f9ebbeb02d3e

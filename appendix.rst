@@ -27,6 +27,7 @@
 - `graphviz 官方文档 <https://graphviz.org/documentation/>`_
 - `Python 进阶 <https://docs.pythontab.com/interpy/>`_
 - `Python 函数模块实例 <https://www.journaldev.com/python>`_
+- `Python3.0 简史 <https://www.cnblogs.com/animalize/p/5633215.html>`_
 
 作图资源
 -----------
