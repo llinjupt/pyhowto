@@ -255,17 +255,17 @@ ASCII码数值转义
 的自然数字与它对应，从0开始。例如字符串 str0 = "Python"，其下标从0开始，则str0[0]对应字符'P'。
 以此类推，str0[5]对应最后的字符'n'。
 
+负数索引编号
+~~~~~~~~~~~~~~~
+
 与 C 语言不同，Python语言提供了负数下标，方便从字符串尾部进行访问。下标从-1向前依次递减。
 
-.. code-block:: python
-  :linenos:
-  :lineno-start: 0
+.. figure:: imgs/slice_index.png
+  :scale: 100%
+  :align: center
+  :alt: DAG
 
-  +---+---+---+---+---+---+
-  | P | y | t | h | o | n |
-  +---+---+---+---+---+---+
-   0   1   2   3   4   5   
-  -6  -5  -4  -3  -2  -1
+  Python 支持负数索引
 
 下标直接访问
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -296,12 +296,13 @@ ASCII码数值转义
   print(str0[1:3])
   print(str0[3:])
   print(str0[3:-1])
-  print(str0[100:])
+  print(len(str0[100:])) # 返回空字符串
 
   >>>
   12
   456789
   45678
+  0
 
 过滤特定的字符
 ~~~~~~~~~~~~~~~~
@@ -1272,4 +1273,203 @@ ord() 还接受传入1个UTF-8编码的字符，并以整数返回码值。
  
 Python3中取消了该函数，chr()将参数范围扩展到了所有UTF-8码值范围。
 在Python2版本中，存在str和unicode两种字符串类型，Python3中只有一种即UTF-8编码字符串类型。
+
+字节序列 Bytes
+-----------------
+
+Python3 中明确区分字符串类型 (str) 和 字节序列类型 (bytes)，也称为字节流。内存，磁盘中均是以字节流的形式保存数据，它由一个一个的字节 （byte，8bit）顺序构成，然而人们并不习惯直接使用字节，既读不懂，操作起来也很麻烦，人们容易看懂的是字符串。
+
+所以字符串和字节流需要进行转化，字节流转换为人们可以读懂的过程叫做解码，与此相反，将字符串转换为字节流的过程叫做编码。我们已经了解对于值在 0-128 之间的字符，可以使用 ASCII 编码，而对于多字节的中文，则需要 GBK 或者 utf-8 编码。
+
+当我们读取文件时，如果打开模式时文本模式，就会自动进行解码的转换，当我们写出字符串时，也会进行编码转换，不需要显式的进行编码，如果要进行网络传输，那么就要手动进行编解码。
+
+Python 对 bytes 类型的数据用带 b 前缀加字符串（如果字节值在 ascii 码值内则显示对应的 ascii 字符，否则显示 \\\x 表示的16进制字节值）表示。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  bytes0 = bytes('abc', 'utf-8')
+  print(type(bytes0).__name__, bytes0)
+  
+  bytes0 = bytes('abc', 'ascii')
+  print(type(bytes0).__name__, bytes0)
+
+  >>>
+  bytes b'abc'
+  bytes b'abc' 
+
+显然对于 'abc' 英文字母构成的字符串使用 'utf-8' 和 'ascii' 方式所得到的字节流是一样的。而对于扩展的单字符，比如值为 255 的字符 'ÿ'，使用 'ascii' 编码则会报错：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+    
+  ch = chr(255)
+  bytes0 = bytes('abc' + ch, 'ascii')
+
+  >>>
+  UnicodeEncodeError: 'ascii' codec can't encode character 
+  '\xff' in position 3: ordinal not in range(128)
+
+此时使用扩展编码 latin1 就不会报错了：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  ch = chr(255)
+  bytes0 = bytes('abc' + ch, 'latin1')
+  print(type(bytes0).__name__, bytes0)
+  
+  >>>
+  bytes b'abc\xff'
+
+utf-8 是一种适用于全世界各种语言文字符号进行编码的编码格式。默认在编写 Python 代码时也使用该编码格式。可以看到一个中文字符，在 utf-8 中通常使用 3 个字节进行编码：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  bytes0 = bytes('中文', 'utf-8')
+  print(type(bytes0), bytes0)
+  
+  >>>
+  <class 'bytes'> b'\xe4\xb8\xad\xe6\x96\x87'
+  
+字节流类型具有只读属性，字节流中的每个字节都是 int 型，可以通过下标访问，但不可更改字节值：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  print(bytes0[0])
+  print(type(bytes0[0]))
+  bytes0[0] = 0
+  
+  >>>
+  228   # 也即 0xe4
+  <class 'int'>
+  TypeError: 'bytes' object does not support item assignment
+
+.. _bytes:
+
+bytes
+~~~~~~~~~~~~~~~~
+
+bytes() 类支持以下参数来实例化一个字节流对象：
+
+1. 不提供参数，生成一个空对象，值为 b''。
+#. 字符串参数，必须提供编码参数 encoding，此时可以传入 errors='ignore' 忽略错误的字节。
+#. 正整数 n，返回含 n 个 \\x00 字节的对象。
+#. bytearray 对象，将可读写的 bytearray 对象转换为只读的 bytes 对象，参考 :ref:`bytearray` 。
+#. 整数型可迭代对象，比如 [1, 2, 3]，每个元素值必须在 [0-255] 之间。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  print(bytes()) # 等价于 bytes(0)
+  
+  # 等价于 print('string'.encode('utf-8'))
+  # 等价于 print(bytes('string', 'utf-8')
+  print(bytes('string', encoding='utf-8')) 
+  
+  print(bytes(3))
+    
+  ba = bytearray([1, 2])
+  print(bytes(ba))
+  
+  print(bytes([1, 2, 3]))
+
+  >>>
+  b''
+  b'string'
+  b'\x00\x00\x00'
+  b'\x01\x02'
+  b'\x01\x02\x03'
+
+bytes 对象具有 decode() 方法，将字节流转换回字符串：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  bytes0 = bytes('中文', 'utf-8')
+  print(bytes0.decode('utf-8'))
+  
+  >>>
+  中文
+
+.. _bytearray:
+
+bytearray
+~~~~~~~~~~~~~~~~
+
+bytearray() 创建一个可读写的字节流对象。其他参数和属性与 bytes() 一致。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  ba = bytearray(3)
+  print(type(ba), ba)
+  
+  ba[0] = 1 # 修改字节值
+  print(ba)
+  
+  >>>
+  <class 'bytearray'> bytearray(b'\x00\x00\x00')
+  bytearray(b'\x01\x00\x00')
+
+hex
+~~~~~~~~~~~~~~~~
+
+hex() 方法可以以 16 进制字符串方式显示字节流对象：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  bytes0 = bytes('中文', 'utf-8')
+  print(bytes0)
+  print(bytes0.hex())
+  
+  >>>
+  
+  b'\xe4\xb8\xad\xe6\x96\x87'
+  e4b8ade69687
+  
+当然也可以将一个 16 进制字符串转换为 bytes 对象：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  int0 = 0x12345678
+  hexstr = hex(int0)
+  print(hexstr)
+  bytes0 = bytes.fromhex(hexstr[2:]) # 去除 0x 前缀
+  print(bytes0)
+  
+  >>>
+  0x12345678
+  b'\x124Vx'  
+    
+类字符串操作
+~~~~~~~~~~~~~~
+
+字节流对象类似 str，所以定义了很多类似字符串的方法，比如转换其中 ascii 字符的大小写，查找等，例如：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  bytes0 = bytes('string', encoding='utf-8')
+  print(bytes0.find(b't')) # 参数必须也是 bytes 类型
+  print(bytes0.swapcase())
+  
+  >>>
+  1
+  b'STRING'
 
