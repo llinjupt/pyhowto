@@ -2026,6 +2026,8 @@ pickle.dumps() 将对象转化为一个字节序列，pickle.loads() 将序列�
   b'\x80\x03]q\x00(K\x01K\x02K\x03e.'
   [1, 2, 3]
 
+.. _hashlib:
+
 hashlib
 ------------------
 
@@ -2170,3 +2172,583 @@ Python 中通过 hexdigest(n) 传递参数 n 指定输出的字节数。
   >>>
   shake_128(20)   : 72877ec8143a659e8002
   shake_256(20)   : c4118461f9ebbeb02d3e
+
+实用场景
+~~~~~~~~~~~~~~~~~~~~
+
+实用散列值的几种场景：
+
+- 信息摘要，用于验证原始文档是否被篡改。
+- 存储口令密码，无论是本地计算机还是服务器都不会明文存储密码，通常可以存储密码的散列值，这样即便是技术人员也无法获取用户口令。
+- 网络传输，明文口令绝不应该出现在网络传输中，通常使用的挑战应答（Challenge-Response）密码验证方法就是通过传输散列值完成。
+- 信息摘要类似于一个文件的指纹，同样可以用于相同文件的查找，或者检查两个文件是否相同，比如网盘数据库，不可能为每一个用户维护相同的文件，相同文件只要保存一份即可。
+
+hmac
+------------
+
+彩虹表是高效的密码散列值攻击方法，为了应对这一挑战，应该在每次对密码进行散列时，加入一个随机的密码值（也称为盐值），这样每次生成的散列值都是变化的，增大了破解难度。
+
+HMAC（Keyed-hash Message Authentication Code 基于密码的散列消息身份验证码）利用哈希算法，以一个密钥和一个消息为输入，在生成消息摘要时将密码混入消息进行计算。
+
+hmac 模块自身不提供散列算法，它借助 :ref:`hashlib` 中的算法实现 HMAC。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  key = b'1234567890'
+  hash_list = ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512', 'blake2b', 
+               'blake2s','sha3_224', 'sha3_256', 'sha3_384', 'sha3_512']
+  
+  for i in hash_list:
+      h = hmac.new(key, b'Hello ', digestmod=i)
+      h.update(b'Python')
+      print(h.hexdigest())
+  
+  >>>
+  d9a6f4a6e6c986332e337cff24e153ef
+  fe6ab8031ce989fd7e9da20f2adf80a609c04a0e
+  ......
+
+实用场景
+~~~~~~~~~~~~
+
+hmac 主要用于密码认证，通常步骤如下：
+
+-  服务器端生成随机的 key 值，传给客户端。
+-  客户端使用 key 将帐号和密码做 HMAC ，生成一串散列值，传给服务器端。
+-  服务端使用 key 和数据库中用户和密码做 HMAC 计算散列值，比对来自客户端的散列值。
+
+这就是挑战应答（Challenge-Response）密码验证方式的基本步骤。
+
+itertools
+-------------------
+
+itertools 模块提供了一组常用的无限迭代器（生成器）以及一组高效的处理迭代器的函数集。
+
+无限迭代器
+~~~~~~~~~~~~~~~~~
+
+count
+````````````
+
+::
+  
+  count(start=0, step=1) --> count object
+  
+count 生成一个累加迭代器，用于生成从 start 开始的等差为 step 的数列，默认则从 0 开始，每次加 1。
+
+由于 Python3.0 开始对数值大小不再有限制，所以它是一个无限生成器。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  import itertools
+  uints = itertools.count()
+  for n in uints:
+      if n > 10:
+          break
+      print(n, end=' ')    
+
+  >>>
+  0 1 2 3 4 5 6 7 8 9 10 
+
+start 和 step 参数可以为负数和小数，不支持复数。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  uints = itertools.count(1.1, -0.1)
+  for n in uints:
+      if n < 0:
+          break
+      print(n, end=' ')  
+  
+  >>>
+  1.1 1.0 0.9 0.8 0.7000000000000001 0.6000000000000001 0.5000000000000001 
+  0.40000000000000013 0.30000000000000016 0.20000000000000015 0.10000000000000014 
+  1.3877787807814457e-16
+
+可以借用它为列表进行编号，例如：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  list0 = ['a', 'b', 'c']    
+  for i in zip(itertools.count(0), list0):
+      print(i)
+  
+  >>>
+  (0, 'a')
+  (1, 'b')
+  (2, 'c')
+
+cycle
+```````````````
+
+::
+
+  cycle(iterable) --> cycle object
+
+cycle() 会把传入的可迭代对象无限重复循环取值：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  for i in itertools.cycle([1,2,3]):
+      print(i, end=' ')
+  
+  >>>
+  1 2 3 1 2 3......
+
+repeat
+`````````````
+
+::
+
+  repeat(object [,times]) -> create an iterator which returns the object
+    for the specified number of times.  If not specified, returns the object
+    endlessly.
+
+repeat() 创建一个迭代器，重复生成 object，times 指定重复计数，如果未提供 times，将无限返回该对象。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  for i in itertools.repeat('abc', 3):
+      print(i)
+
+  >>>
+  abc
+  abc
+  abc
+
+takewhile 和 dropwhile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+takewhile 和 dropwhile 可以为迭代器添加条件。
+
+takewhile
+```````````````````
+
+::
+
+  takewhile(predicate, iterable) --> takewhile object
+    Return successive entries from an iterable as long as the 
+    predicate evaluates to true for each entry.
+
+predicate 是一个断言函数，只要返回 Flase，停止迭代。它返回一个新的迭代器。
+ 
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  uints = itertools.count(0)
+  tw = itertools.takewhile(lambda x: x <= 10, uints)
+  
+  for i in tw:
+      print(i, end=' ')
+
+  >>>
+  0 1 2 3 4 5 6 7 8 9 10 
+
+dropwhile
+```````````````````
+
+::
+
+  dropwhile(predicate, iterable) --> dropwhile object
+    Drop items from the iterable while predicate(item) is true.
+    Afterwards, return every element until the iterable is exhausted.
+
+dropwhile() 与 takewhile() 相仿，当 predicate 断言函数返回 True 时丢弃生成的元素，一旦返回 False，返回迭代器中剩下来的项。它返回一个新的迭代器。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  dw = itertools.dropwhile(lambda x: x < 3, [1, 2, 3, 0])
+  for i in dw:
+      print(i, end=' ')
+      
+  >>>
+  3 0
+
+chain
+~~~~~~~~~~~~~~~~
+
+::
+  
+  chain(*iterables) --> chain object
+  
+chain() 可以把一组迭代对象串联起来，形成一个新的迭代器，返回的元素按迭代对象在参数中出现的顺序，依次取出。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  for i in itertools.chain('abc', [1, 2, 3]):
+      print(i, end=' ')
+      
+  >>>
+  a b c 1 2 3
+
+groupby
+~~~~~~~~~~~~~~
+
+::
+
+  groupby(iterable[, keyfunc]) -> create an iterator which returns
+      (key, sub-iterator) grouped by each value of key(value).
+
+groupby() 把迭代器中相邻的重复元素归类到一个组，每一个组都是一个迭代器。不相邻元素不会归类到同一个组：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  for key, group in itertools.groupby('aabbcca'):
+      print(key, [i for i in group])
+  
+  >>>
+  a ['a', 'a']
+  b ['b', 'b']
+  c ['c', 'c']
+  a ['a']
+
+可以为 groupby() 指定一个 keyfunc，只要作用于函数的元素返回的值相等，就被归类在一组，而函数返回值作为该组的 key 。
+
+下面的例子用于从字符串中挑选出数字和非数字：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  for key, group in itertools.groupby('a0b1', lambda x: x.isdigit()):
+      print(key, [i for i in group])
+  
+  >>>
+  False ['a']
+  True ['0']
+  False ['b']
+  True ['1']
+
+我们把实现稍加改造，就可以把元素分类到多个组中：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  result = {True : [], False : []}
+  for key, group in itertools.groupby('a0b1', lambda x: x.isdigit()):
+      result[key] += [i for i in group]
+  print(result)
+  
+  >>>
+  {True: ['0', '1'], False: ['a', 'b']}
+
+compress
+~~~~~~~~~~~~~~
+
+::
+
+  compress(data, selectors) --> iterator over selected data
+
+compress() 类似 filter() 函数，只是它接受一个选择器，如果选择器的值为 True，非0值，非 'n' 则返回元素，否则被过滤掉。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+   
+  selector = [True, False, 1, 0, -1, 'y', 'n']
+  val_list = [str(i) for i in selector]
+  print(val_list)
+  for item in itertools.compress(val_list, selector):
+      print(item, end=' ')
+  
+  True 1 -1 y n 
+  >>>
+
+islice
+~~~~~~~~~~~~~~~~~~
+
+::
+
+   islice(iterable, stop) --> islice object
+   islice(iterable, start, stop[, step]) --> islice object
+
+islice() 类似序列对象的切片操作，通过索引来选择元素。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  # 类似 string[:5]
+  for i in itertools.islice(itertools.count(), 5):
+      print(i, end=' ')
+  print()
+  
+  # 类似 string[5:10]
+  for i in itertools.islice(itertools.count(), 5, 10):
+      print(i, end=' ')
+  print()
+  
+  # 类似 string[0:100:10]
+  for i in itertools.islice(itertools.count(), 0, 100, 10):
+      print(i, end=' ')
+  print()
+  
+  >>>
+  0 1 2 3 4 
+  5 6 7 8 9 
+  0 10 20 30 40 50 60 70 80 90 
+
+排列组合
+~~~~~~~~~~~~~~~~~
+
+permutations
+```````````````````
+
+::
+
+  permutations(iterable[, r]) --> permutations object
+      Return successive r-length permutations of elements in the iterable.
+
+permutations() 返回一个迭代器，迭代器生成可迭代对象中选取 r 个元素的所有排列组合。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  for item in itertools.permutations([1, 2, 3], 2): 
+      print(item) 
+  
+  for item in itertools.permutations(range(3)):
+      print(item)
+  
+  >>>
+  (1, 2)
+  (1, 3)
+  ......
+  (0, 1, 2)
+  (0, 2, 1)
+  (1, 0, 2)
+  ......
+
+combinations
+```````````````````
+
+::
+
+  combinations(iterable, r) --> combinations object
+      Return successive r-length combinations of elements in the iterable.
+
+combinations() 返回一个迭代器，迭代器生成可迭代对象中选取 r 个元素的所有组合，不考虑排列顺序。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  for item in itertools.combinations([1, 2, 3], 2): 
+      print(item) 
+  
+  for item in itertools.combinations(range(3)):
+      print(item)
+  
+  >>>
+  (1, 2)
+  (1, 3)
+  (2, 3)
+  (0, 1, 2)
+
+combinations_with_replacement() 包含只有元素重复自身形成的组合：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  for item in itertools.combinations_with_replacement([1, 2, 3], 2): 
+      print(item) 
+  
+  >>>
+  (1, 1)
+  (1, 2)
+  (1, 3)
+  (2, 2)
+  (2, 3)
+  (3, 3)
+
+笛卡尔积
+~~~~~~~~~~~~~~~~
+
+::
+
+  product(*iterables, repeat=1) --> product object
+      Cartesian product of input iterables.  Equivalent to nested for-loops.
+
+product() 返回多个可迭代对象的所有排列组合，也即笛卡尔积。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  gp = itertools.product((1, 2), ('a', 'b'))
+  for i in gp:
+      print(i)
+  
+  >>>
+  (1, 'a')
+  (1, 'b')
+  (2, 'a')
+  (2, 'b')
+
+repeat 指定可迭代对象中的每个元素可以重复次数。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  gp = itertools.product((1, 2), ('a', 'b'), repeat=2)
+  for i in gp:
+      print(i)
+
+  >>>
+  (1, 'a', 1, 'a')
+  (1, 'a', 1, 'b')
+  (1, 'a', 2, 'a')
+  (1, 'a', 2, 'b')
+  ......
+
+starmap
+~~~~~~~~~~~~~~~~
+
+starmap() 创建一个用传入的函数和可迭代对象计算的迭代器。 map() 和 starmap() 的区别在于参数传递方式：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+
+  func = lambda x, y: (x, y, x * y)
+  for i in itertools.starmap(func, [(0, 5), (1, 6)]):
+      print('%d * %d = %d' % i)
+
+  for i in map(func, [0, 1], [5, 6]):
+      print('%d * %d = %d' % i)
+
+  >>>
+  0 * 5 = 0
+  1 * 6 = 6
+  0 * 5 = 0
+  1 * 6 = 6
+
+迭代器复制 tee
+~~~~~~~~~~~~~~~~
+
+::
+
+  tee(iterable, n=2) --> tuple of n independent iterators.
+
+tee() 从一个可迭代对象创建 n 个独立的迭代器。类似于复制生成了多个迭代器。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  # 等价操作
+  import copy
+  uint0 = itertools.count(0)
+  uint1 = copy.deepcopy(uint0)
+  print(next(uint0), next(uint1))
+  
+  uint2, uint3 = itertools.tee(itertools.count(0), 2)
+  print(next(uint2), next(uint3))
+  
+  >>>
+  0 0
+  0 0
+
+累积 accumulate
+~~~~~~~~~~~~~~~
+
+::
+  
+  accumulate(iterable[, func]) --> accumulate object
+      Return series of accumulated sums (or other binary function results).
+
+accumulate() 生成的迭代器返回累积求和结果，默认进行求和，可以通过传入不同的函数完成特定操作：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  # 累积求和
+  ac = itertools.accumulate([1, 2, 3, 4])
+  print([i for i in ac])
+  
+  # 累积乘积
+  func = lambda x, y: x * y  
+  ac = itertools.accumulate([1, 2, 3, 4], func)
+  print([i for i in ac])
+  
+  >>>
+  [1, 3, 6, 10] 
+  [1, 2, 6, 24]
+
+filterfalse
+~~~~~~~~~~~~~~~~~~~
+
+::
+  
+  filterfalse(function or None, sequence) --> filterfalse object
+      Return those items of sequence for which function(item) is false.
+      If function is None, return the items that are false.
+
+filterfalse() 与 filter() 恰恰相反，它在断言函数返回 False 时把值加入生成器，否则舍弃。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  dw = filter(lambda x: x < 3, [1, 2, 3, 0])
+  print([i for i in dw])
+  
+  dw = itertools.filterfalse(lambda x: x < 3, [1, 2, 3, 0])
+  print([i for i in dw])
+  
+  # 传入 None 返回值为 False 的元素
+  dw = itertools.filterfalse(None, [1, 2, 3, 0])
+  print([i for i in dw])
+  >>>
+  [1, 2, 0]
+  [3]
+  [0]
+
+.. _zip_longest:
+
+zip_longest
+~~~~~~~~~~~~~~
+
+::
+
+  zip_longest(iter1 [,iter2 [...]], [fillvalue=None]) --> zip_longest object
+
+zip_longest() 与 zip() 函数很像，参考 :ref:`zip` ，用于将两个或多个可迭代对象配对。只是当可迭代对象的长度不同，可以指定默认值。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  for i in zip_longest('123', 'ab', 'xy', fillvalue='default'):
+    print(i)
+  
+  >>>
+  ('1', 'a', 'x')
+  ('2', 'b', 'y')
+  ('3', 'default', 'default')
+
+.. include:: operator.rst
