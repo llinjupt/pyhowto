@@ -30,12 +30,14 @@
 - `Python3.0 简史 <https://www.cnblogs.com/animalize/p/5633215.html>`_
 - `Module of the Week <https://pymotw.com/3/>`_
 
-作图资源
+图像相关
 -----------
 - `Graphviz 官网 <http://www.graphviz.org>`_
 - `Graphviz 示例1 <https://graphs.grevian.org/example>`_
 - `Graphviz 示例2 <https://renenyffenegger.ch/notes/tools/Graphviz/examples/index>`_
 - `Graphviz 示例3 <http://www.tonyballantyne.com/graphs.html>`_
+- `Pillow 图像处理 <https://pillow.readthedocs.io/en/5.3.x/>`_
+- `Turtle 绘图示例 <https://www.zhihu.com/question/271643290/answer/525019532>`_
 
 正则表达式
 --------------
