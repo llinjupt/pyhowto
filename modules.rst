@@ -2065,6 +2065,10 @@ digest() 返回 bytes 字节序列类型，hexdigest() 则直接返回 16 进制
 
 如果需要计算的数据非常大，那么可以循环调用 update() 方法，例如下面的示例：
 
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
   md5 = hashlib.md5()
   md5.update('你好 '.encode('utf-8'))
   md5.update(b'Python')
@@ -2182,6 +2186,25 @@ Python 中通过 hexdigest(n) 传递参数 n 指定输出的字节数。
 - 存储口令密码，无论是本地计算机还是服务器都不会明文存储密码，通常可以存储密码的散列值，这样即便是技术人员也无法获取用户口令。
 - 网络传输，明文口令绝不应该出现在网络传输中，通常使用的挑战应答（Challenge-Response）密码验证方法就是通过传输散列值完成。
 - 信息摘要类似于一个文件的指纹，同样可以用于相同文件的查找，或者检查两个文件是否相同，比如网盘数据库，不可能为每一个用户维护相同的文件，相同文件只要保存一份即可。
+
+计算文件的 md5 值，示例：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+    
+  def file_md5(file):
+      import hashlib
+      with open(file, 'rb') as f:
+          md5 = hashlib.md5()
+          while True:
+              data = f.read(10240)
+              if len(data) > 0:
+                  md5.update(data)
+              else:
+                  break
+  
+      return md5.hexdigest()   
 
 hmac
 ------------
