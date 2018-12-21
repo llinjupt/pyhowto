@@ -17,6 +17,7 @@ Python 从入门到深入
   string
   list
   dict
+  set
   file
   time
   exception
