@@ -17,14 +17,14 @@ Python 提供的基本数据类型都是可散列的，比如数值型，str 和
 
 .. admonition:: 注意
 
-  如果一个类型没有定义 __eq__，那么它也不应该定义__hash__，集合操作依赖于这两个对象方法。
+  如果一个类型没有定义 __eq__()，那么它也不应该定义__hash__()，集合操作对成员进行重复比较时，首先查看 __hash_() 值是否相等，然后再分别使用两个对象的 __eq__() 比较，只有全部为真时，才认为是重复元素，如果没有实现对应方法则报错。
 
 以下示例可已看出由于 a 和 b 的散列值都是 1，最终键 a 的值被键 b 的值覆盖。
 
 .. code-block:: python
   :linenos:
-  :lineno-start: 0 
-  
+  :lineno-start: 0
+
   class HashableCls():
       def __eq__(self, b):
           return True
@@ -267,7 +267,7 @@ set0.symmetric_difference(set1) 合并 set0 和 set1 中的不同元素，返回
   
   >>>
   {'a', 'c'}
-  
+
 symmetric_difference_update() 更新原集合，无返回。
 
 .. code-block:: python
