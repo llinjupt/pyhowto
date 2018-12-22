@@ -30,6 +30,11 @@
 - `Python3.0 简史 <https://www.cnblogs.com/animalize/p/5633215.html>`_
 - `Module of the Week <https://pymotw.com/3/>`_
 
+数据编码
+--------------
+- `JSON 格式 <http://www.json.org/json-zh.html>`_
+
+
 图像相关
 -----------
 - `Graphviz 官网 <http://www.graphviz.org>`_
