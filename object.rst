@@ -1058,6 +1058,99 @@ __sizeof__
 
 __sizeof__() 方法在 sys.getsizeof(obj) 中被调用，获取对象占用内存大小。
 
+.. _enter_exit:
+
+__enter__ 和 __exit__
+```````````````````````
+
+Python 的 with as 语句提供自动回收资源的魔法。实际上就是调用的对象的这两个方法完成的。
+
+with as 语句最常用来进行文件句柄的自动关闭，这样我们就不用再担心忘记关闭文件描述符了，例如：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  with open('tmp.txt', 'r') as f:
+      data = file.read()
+      .....
+
+为了阐述 with as 语句和 __enter__， __exit__ 之间的关系，我们看下面的示例：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  class WithAs():
+      def __enter__(self):
+          print('call __enter__')
+          return 'abc'
+  
+      def __exit__(self, exc_type, exc_value, trace):
+          print("call __exit__\n", exc_type, exc_value, trace)
+  
+  obj = WithAs()
+  with obj as i:
+      print(i)
+  print('--------------')
+
+  >>>
+  call __enter__
+  abc
+  call __exit__ 
+  None None None
+  --------------
+
+在 obj as i 时执行 __enter__()，并把它的返回值赋值给 i，我们可以在语句块中使用它。在 with 语句块结束时自动调用 __exit__() 方法。
+
+with as 语句的真正强大之处在于它可以处理异常，我们注意到 __exit__ 方法还有 exc_type 等三个参数，它们就是用来协助处理异常的，正常情况下这三个参数均设置为 None，可以使用 exc_type 是否为 None 判断 with 语句块是否出现异常。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  class WithAs():
+      def div0(self):
+          1/0
+      def __enter__(self):
+          return self
+  
+      def __exit__(self, exc_type, exc_value, trace):
+          print(exc_type)
+          print(exc_value)
+          print(trace)
+          if exc_type is not None:
+              # rollback something
+          else:
+              # clean something
+
+  with WithAs() as obj:
+      obj.div0()
+  
+  >>>
+  call __exit__
+  <class 'ZeroDivisionError'>
+  division by zero
+  <traceback object at 0x000001C18B79A0C8>
+  ......
+  ZeroDivisionError: division by zero
+
+这里返回了一个匿名函数，在 with 语句块中调用它发生了除 0 错误，一旦出现了异常，就会调用 __exit__ 方法，并把异常类型，异常值和 traceback  对象传递给各个参数。with 语句块中出现任何没有显式（try）处理的异常时都会调用 __exit__ 方法，并传递相应的异常参数，例如：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  with WithAs() as obj:
+      1/0
+
+  >>>
+  <class 'ZeroDivisionError'>
+  division by zero
+  <traceback object at 0x000001C18B83A2C8>
+    ......
+  ZeroDivisionError: division by zero
+
 attr 内置方法
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1214,9 +1307,6 @@ __dir__()             dir(obj)              获取属性字典
 __bool__()            bool(obj) if obj:     转换为布尔值
 __str__()             str(obj)              转换为字符串
 __repr__()            repr(obj)             表达式
-__call__()            obj()                 可调用 callable 对象  
-__iter__()            iter(obj)             可迭代 iterable 对象 
-__next__()            next(obj)             迭代器 iterator
 __delattr__(attr)     del obj.attr          删除对象属性
 __setattr__(attr,val) obj.attr = val        设置对象属性
 __getattr__(attr)     getattr(obj, attr)    获取对象属性
@@ -1224,8 +1314,12 @@ __delitem__(index)    del obj[index]        删除 index 索引元素
 __getitem__(index)    obj[index] slice      获取索引值
 __setitem__(index, v) obj[index] = v        根据索引设置值
 __index__()           index(obj)            获取索引
+__call__()            obj()                 可调用 callable 对象  
+__iter__()            iter(obj)             可迭代 iterable 对象 
+__next__()            next(obj)             迭代器 iterator
 __hash__()            hash(obj)             求hash值，如同时实现 __eq__ 则是可散列对象
 __sizeof__()          sys.getsizeof(obj)    获取对象占用内存大小
+__enter__ __exit__()  with as               自动清理
 ===================== ==================== =====================
 
 实例所属类的判定
