@@ -159,7 +159,7 @@ cp936 编码，也即 GBK 编码，所以在 Windows 上默认读写文件使用
 
 - 读取
 
-  - file.read([size=-1]) 从文件读取指定的字节数，如未指定或为负则读取所有。
+  - file.read([size=-1]) 从文件读取指定的字节数，如未指定或为负则读取所有，返回读取数据，无数据时返回空字符串 ''。
   - file.readline([size=-1]) 读取一行含换行符，如指定正整数，则最多返回 size 个字符。
   - file.readlines([hint=-1]) 读取所有行以列表返回，如指定整数，至少读取 hint 个字符，确保最后读取的行是完整的。     
 
@@ -186,7 +186,19 @@ cp936 编码，也即 GBK 编码，所以在 Windows 上默认读写文件使用
 .. admonition:: 注意
 
   任何对文件的读取和写入动作，都会自动改变文件的指针偏移位置。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
   
+  with open("sample.py", 'r') as f:
+    data = f.read()
+    data = f.read()
+    print(repr(data))
+  
+  >>>
+  ''
+
 文件或目录常用操作
 -------------------
 
