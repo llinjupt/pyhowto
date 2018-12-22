@@ -377,6 +377,8 @@ map() 函数的本质等同于如下函数：
     	
     	return result
 
+.. _reduce:
+
 reduce
 ~~~~~~~~~~~~~~
 
