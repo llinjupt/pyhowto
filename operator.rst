@@ -384,10 +384,10 @@ JSON特殊字符
 
 JSON 中的特殊字符有以下几种，使用时需要转义：
 
-- " ，字符串由双引号表示，所以字符串中出现 " 需要使用转义符 \\"。
-- \\，用于转义，所以字符串中出现 \\，需要使用 \\\\。
+- " ，字符串由双引号表示，所以字符串中出现 " 需要转义。
+- \\，用于转义，当字符串中出现 \\，需要使用 \\\\。
 - 控制字符 \\r，\\n，\\f，\\t，\\b。
-- \\u 加四个16进制数字，Unicode码值，用于表示一些特殊字符，例如 \\0，\\v。中文字符在默认 utf-8 编码下可以不转换，json 模块提供了一个 ensure_ascii 开关参数。
+- \\u 加四个16进制数字，Unicode码值，用于表示一些特殊字符，例如 \\0，\\v等不可见字符。中文字符在默认 utf-8 编码下可以不转换，json 模块提供了一个 ensure_ascii 开关参数。
 
 .. code-block:: js
   :linenos:
@@ -616,3 +616,151 @@ loads() 参数中的 object_hook 指定反向转换函数可以实现逆转换�
       args = { key: value
                for key, value in d.items()}
       return JSONCls(**args)
+
+
+base64
+-----------------
+
+有时候我们需要把不可见字符变成可见字符来进行传输，比如邮件附件可以是图片等二进制文件，但是传输协议 SMTP 就只能传输纯文本数据，所以必须进行编码。
+如果要把一个文件嵌入到另一个文本文件中，也可以使用这种方法。比如 JSON 文件中嵌入另一个 JSON 文件。
+
+Base64 编码是一种非常简单的将任意二进制字节数据编码成可见字符的机制。
+
+Base64 选用了"A-Z、a-z、0-9、+、/" 这 64 个可打印字符作为索引表，索引从 0-63。编码过程如下：
+
+- 对二进制数据每 3 个 bytes 一组，每组有 3 x 8 = 24 个 bits，再将它划为 4 个小组，每组有 6 个 bits。
+- 6 个 bits 的值的范围就是 0-63，通过查索引表，转换为对应的 4 个可见字符。
+- 如果要编码数据字节数不是 3 的倍数，最后会剩下 1 或 2 个字节，Base64 用 \x00 字节在末尾补足后进行编码，再在编码的末尾加上 1 或 2 个 '=' 号，表示补了多少字节的 \x00，解码的时候去掉。
+
+所以，Base64 编码会把 3 bytes 的二进制数据编码为 4 bytes 的文本数据，数据大小会比原来增加 1/3。
+
+编解码
+~~~~~~~~~~~~~~~
+
+::
+
+  b64encode(s, altchars=None)
+      Encode the bytes-like object s using Base64 and return a bytes object.
+  b64decode(s, altchars=None, validate=False)
+      Decode the Base64 encoded bytes-like object or ASCII string s.
+    
+b64encode() 接受一个 bytes 类型参数，并返回一个 bytes 对象，所以如果需要转换为字符串，则需要格式化。
+b64decode() 与 b64encode() 类似，用于解码。 
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+        
+  import base64
+  
+  encoded = base64.b64encode(b'\x00\x00\x00\xfb\xef\xff')
+  print(encoded)
+  
+  str0 = '{}'.format(encoded) # 格式化为字符串
+  print(str0[2:-1])
+  
+  print(base64.b64decode(encoded))
+  
+  >>>
+  b'AAAA++//'
+  AAAA++// 
+  b'\x00\x00\x00\xfb\xef\xff'
+
+altchars 参数接受一个 2 字节长度的 bytes 类型，用于替换字符串中的 + 和 /。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  encoded = base64.b64encode(b'\x00\x00\x00\xfb\xef\xff', altchars=b'-_')
+  print(encoded)
+  
+  str0 = '{}'.format(encoded)
+  print(str0[2:-1])
+  
+  print(base64.b64decode(encoded, altchars=b'-_'))
+  
+  >>>
+  b'AAAA--__'
+  AAAA--__
+  b'\x00\x00\x00\xfb\xef\xff'
+
+URL 编码
+~~~~~~~~~~~~~~
+
+- URI（Uniform Resource Identifier），统一资源标识符。
+- URL（Uniform Resource Locater），统一资源定位符。
+- URN（Uniform Resource Name），统一资源名称。
+
+URI 由 URL 和 URN 组成，它们三者的关系如下：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+                 URL                                   Anchor
+  ----------------------------                         ---- 
+  http://www.fake.com:80/path/hello.html?query=hi&arg=0#id0
+         ----------------------------------------------
+                          URN
+  -----------------------------------------------------
+                        URI
+
+URL 包含了获取资源协议，主机，端口和路径部分，它指定了一个地址位置。
+URN 不含获取资源的协议部分，唯一定义了某个位置上的资源。
+
+可以看到一个常见的 URI 可以包含如下部分：
+
+- 获取协议（Scheme），例如 http, https, ftp 等。
+- 主机和端口，以冒号分割，如果使用默认 80 端口，可以不提供端口信息。
+- 路径，用 '/' 表示目录层次
+- 查询字符串，以 ? 开始，& 连接多个查询参数。
+- 片段（Anchor），以 # 开始，标记资源中的子资源，也即资源中的某一部分，不发送给服务器，由浏览器处理。
+
+所以我们所说的 URL 编码准确的说是 URI 编码，现实是这两个概念常常混用。
+
+RFC3986文档规定，URL 中允许字符为 [a-zA-Z0-9] 和 “-_.~4” 个特殊字符以及保留字符。
+
+保留字符：URL可以划分成若干个组件，协议、主机、路径等。有一些字符（:/?#[]@）是用作分隔不同组件的。例如：冒号用于分隔协议和主机，/用于分隔主机和路径，?用于分隔路径和查询参数，等等。还有一些字符（!$&'()*+,;=）用于在每个组件中起到分隔作用的，如=用于表示查询参数中的键值对，&符号用于分隔查询多个键值对。当组件中的普通数据包含这些特殊字符时，需要对其进行编码。
+
+RFC3986中指定的保留字符有 ! * ' ( ) ; : @ & = + $ , / ? # [ ]。
+
+所有其他字符均需要编码，当保留字符出现在非功能分割字段时也需要编码。
+
+URL 编码采用百分号编码方式：一个百分号 %，后跟两个表示字符 ASCII 码值的16进制数，例如 %20 表示空格。
+
+RFC 推荐字符采用 UTF-8 编码方式，也即一个字符的 UTF-8 编码为 0x111213，那么 URL 编码对应 %11%12%13。
+
+Base64对URL编码
+~~~~~~~~~~~~~~~~
+
+由于 URL 编码不支持标准的 Base64 索引表中的 + 和 / 字符，所以可以使用 - 和 _ 替代它们。
+
+base64 模块内置了 urlsafe_b64encode() 和 urlsafe_b64decode() 方法用于 URL 编码：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  encoded = base64.urlsafe_b64encode(b'\0\0\0\xfb\xef\xff')
+  print(encoded)
+  
+  str0 = '{}'.format(encoded)
+  print(str0[2:-1])
+  
+  print(base64.urlsafe_b64decode(encoded))
+
+  >>>
+  b'AAAA--__'
+  AAAA--__
+  b'\x00\x00\x00\xfb\xef\xff'
+
+由于=字符也可能出现在Base64编码中，但=在URL和Cookie中不是合法字符，所以，很多Base64编码后会把=去掉。
+Base64 把3个字节变为4个字节，Base64编码的长度总是 4 的倍数，当发现编码后长度不是 4 的倍数后，补足= 再解码就可以了。
+
+注意事项
+~~~~~~~~~~~~~~~~
+
+Base64 适用于轻量级编码，比如查询字段，Cookie内容和内嵌文件，例如在 JSON 或 XML 中内嵌一段二进制数据。
+
+Base64 编码不适用于加密，它只是简单的字符映射，很容易被破解。
