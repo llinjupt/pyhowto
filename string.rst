@@ -1214,7 +1214,7 @@ isnumeric() 在unicode空间上要宽泛得多。
 世界上存在这各种各样的符号，有数学符号，有语言符号，为了在计算机中统一表达，制定了
 统一编码规范，被称为Unicode编码。它让计算机具有了跨语言、跨平台的文本和符号的处理能力。
 
-`字符编码笔记：ASCII，Unicode 和 UTF-8 <http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html>`_ 和
+`细说编码 <https://blog.csdn.net/zhouguoqionghai/article/details/79733525>`_ 和
 `彻底理解字符编码 <http://www.cnblogs.com/leesf456/p/5317574.html>`_ 是两篇了解字符编码比较深入浅出的文章。
 这里只做简单的总结性介绍。
 
@@ -1224,34 +1224,45 @@ isnumeric() 在unicode空间上要宽泛得多。
 ~~~~~~~~~~~~~~~~~~
 
 - ASCII编码：美国制定，单字节编码，只用了8位的后7位，第一位总是0，一共128个字符
-- ISO-8859-1(别名Latin1)：ISO组织制定，单字节编码，扩展了Ascii编码的最高位，一共256个字符
+- ISO-8859-1(Latin1)：ISO组织制定，单字节编码，扩展了Ascii编码的最高位，一共256个字符
 - GB2312：分区编码，针对简体中文，2字节编码，高字节表示区，低字节表示位，共收录6763个中文字符
-- BIG5：针对繁体中文，2字节编码，共收录13060个中文字符
-- GBK(别名cp936)：“国标”、“扩展”汉语拼音的第一个字母缩写，2字节编码。扩展了GB2312编码，完全兼容GB2312，包含繁体字符，但是不兼容BIG5 (所以BIG5编码的文档采用GBK打开是乱码，GB2312采用GBK打开可以正常浏览)
+- BIG5(cp950)：针对繁体中文，2字节编码，共收录13060个中文字符
+- GBK(cp936)：“国标”、“扩展”汉语拼音的第一个字母缩写，2字节编码。扩展了GB2312编码，完全兼容GB2312，包含繁体字符，但是不兼容BIG5 (所以BIG5编码的文档采用GBK打开是乱码，GB2312采用GBK打开可以正常浏览)
 - Unicode(统一码/万国码/单一码)：全球通用的单一字符集，包含人类迄今使用的所有字符，但只规定了符号的编码值，没有规定计算机如何编码和存储，针对Unicode有两种编码方案。
 
 Unicode编码方案主要有两条主线：UCS和UTF。
 
 - UCS(Universal Character Set)：由ISO/IEC标准组织维护管理，包含两种编码方案
   
-  - UCS-2：2字节编码
-  - UCS-4: 4字节编码，需要BOM机制
-- UTF(Unicode Transformation Format)：由Unicode Consortium进行维护管理，目前有三种编码方案
+  - UCS-2：2字节编码，BOM（LE: FF FE；BE: FE FF）
+  - UCS-4: 4字节编码，BOM（LE: FF FE 00 00；BE: 00 00 FE FF）
+
+- UTF(Unicode Transformation Format)：由 Unicode Consortium 进行维护管理，目前有三种编码方案
 
   - UTF-8：1-4字节变长编码，压缩了存储空间，加快了数据传输速度，无需BOM机制。
-  - UTF-16：2或者4字节编码
-  - UTF-32: 4字节编码 
-  
+  - UTF-16：2或者4字节编码，BOM（LE: FF FE；BE: FE FF）
+  - UTF-32: 4字节编码， BOM（LE: FF FE 00 00；BE: 00 00 FE FF）
+
 目前最普遍使用的是UTF-8编码。
+
+  =========== ========= ======== ======== ========== ===========
+  编码方式    UTF-8     UTF-16   UTF-32	  UCS-2	     UCS-4
+  =========== ========= ======== ======== ========== ===========
+  编码空间    0-10FFFF  0-10FFFF 0-10FFFF	0-FFFF     0-7FFFFFFF
+  最少字节数  1         2	       4        2          4
+  最多字节数  4         4	       4	      2	         4
+  BOM 依赖    n         y        y        y          y
+  =========== ========= ======== ======== ========== ===========
 
 编码码值和字符转换
 ~~~~~~~~~~~~~~~~~~~
 
-ASCII编码字符转换
+Python3 中，ord() 和 chr() 可以实现 Unicode 字符和码值之间的转换。
+
+ASCII码值字符转换
 ````````````````````
 
-ord() 和 chr() 方法实现了字符和编码值的转换。它们不仅支持0-127的ASCII值，
-还支持ISO-8859-1扩充部分，也即0-255的编码值。
+ord() 和 chr() 方法实现了字符和编码值的转换。它们不仅支持0-127的 ASCII 码，还支持 ISO-8859-1 的扩充部分，也即 0-255 的码值。
 
 .. code-block:: python
   :linenos:
@@ -1260,36 +1271,51 @@ ord() 和 chr() 方法实现了字符和编码值的转换。它们不仅支持0
   print(ord('a')) # 返回单个字符的ascii码，整型
   print(chr(65))  # 返回ascii码对应的字符，参数范围:0-255
   print(ord(chr(255)))
-  
+
   >>>
   97
   A
   255
 
-UTF8编码字符转换
+Unicode码值字符转换
 ```````````````````
 
-ord() 还接受传入1个UTF-8编码的字符，并以整数返回码值。
+ord() 还接受传入 1 个宽字符，并返回它的 Unicode 码值。
 
-此时与 ord()相对应的函数是 unichr()，它也支持ASCII码值，因为ASCII码是UTF-8的子集。
+此时与 ord() 相对应的函数是 unichr()，它也支持 ASCII 码，因为 ASCII 码是 Unicode 的子集。
 
 .. code-block:: sh
   :linenos:
   :lineno-start: 0
   
-  print("Oct: %d Hex: u%04x" % (ord(u"一"), ord(u"一")))
-  print(u"\u4e00")  # python3 中等同 print("\u4e00")
+  # python3 中等同 ord('一')
+  print("Oct: %d Hex: u%04x" % (ord(u'一'), ord(u"一")))
+  print('\u4e00')
   print(unichr(19968))
   print(unichr(65))
-  
+
   >>>
   Oct: 19968 Hex: u4e00
   一
   一
   A
- 
-Python3中取消了该函数，chr()将参数范围扩展到了所有UTF-8码值范围。
-在Python2版本中，存在str和unicode两种字符串类型，Python3中只有一种即UTF-8编码字符串类型。
+
+Python3中取消了 unichr() 函数，chr() 将参数范围扩展到了所有 Unicode 码值范围。
+
+在Python2版本中，存在 str 和 unicode 两种字符串类型，Python3 中只有一种即 unicode 字符串类型。
+
+注意 Unicode 码值和 utf-8 编码之间的关系，Unicode 提供的是码值，utf-8 将码值根据规则变换成可以存储的编码。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  print(hex(ord('一')))      # 16进制的Unicode码值
+  print('一'.encode('utf-8'))# 3字节的 UTF-8 编码
+
+  >>>
+  0x4e00
+  b'\xe4\xb8\x80'
 
 字节序列 Bytes
 -----------------
@@ -1348,7 +1374,7 @@ utf-8 是一种适用于全世界各种语言文字符号进行编码的编码�
   :linenos:
   :lineno-start: 0
   
-  bytes0 = bytes('中文', 'utf-8')
+  bytes0 = bytes('中文', 'utf-8') # 等价于 '中文'.encode('utf-8')
   print(type(bytes0), bytes0)
   
   >>>
@@ -1472,7 +1498,30 @@ hex() 方法可以以 16 进制字符串方式显示字节流对象：
   >>>
   0x12345678
   b'\x124Vx'  
-    
+
+bytes 和字符串转换
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+我们已经知道，str 对象编码后变为 bytes 对象，bytes 对象解码后对应 str 对象。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  bytes0 = bytes('中文', 'utf-8')
+  bytes1 = '中文'.encode('utf-8')
+  print(bytes0, bytes1)
+  
+  str0 = bytes0.decode('utf-8')
+  str1 = str(bytes1, 'utf-8')
+  print(str0, str1)
+  
+  >>>
+  b'\xe4\xb8\xad\xe6\x96\x87' b'\xe4\xb8\xad\xe6\x96\x87'
+  中文 中文
+
+bytes() 中的编码意为对参数进行编码得到 bytes 对象，str() 中的编码意为对参数进行解码得到 str 对象。
+
 类字符串操作
 ~~~~~~~~~~~~~~
 
