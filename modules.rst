@@ -1999,13 +1999,11 @@ pickle.dump() 方法将对象导出到文件，pickle.load() 加载对象。可�
   
   with open('obj.txt','rb') as fr:  
       rlist = pickle.load(fr)  
-      print(rlist)  
       rtuple = pickle.load(fr)  
-      print(rtuple) 
+      print(rlist, rtuple) 
   
   >>>
-  [1, 2, 3]
-  ('a', 'b', 'c')
+  [1, 2, 3] ('a', 'b', 'c')
 
 生成字节序列
 ~~~~~~~~~~~~~~~~~~~~~
