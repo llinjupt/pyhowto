@@ -12,6 +12,7 @@
 参考网站
 -----------
 - `Python官方文档 <https://docs.python.org>`_ 
+- `廖雪峰 Python 教程 <https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000>`_
 - `机器学习 <https://thepythonguru.com/top-5-machine-learning-libraries-in-python/#more-1948>`_
 - `2to3版本代码转换工具 <https://bitbucket.org/python_mirrors/2to3>`_
 - `Python公开课 <https://python123.io>`_
@@ -34,6 +35,10 @@
 --------------
 - `JSON 格式 <http://www.json.org/json-zh.html>`_
 
+数据库相关
+--------------
+- `Python 数据库操作实例 <http://www.cnblogs.com/idbeta/p/5209522.html>`_
+- `Sqlite数据库操作 <http://www.runoob.com/sqlite/sqlite-data-types.html>`_
 
 图像相关
 -----------
