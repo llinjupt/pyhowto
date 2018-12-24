@@ -1468,7 +1468,7 @@ bytearray() 创建一个可读写的字节流对象。其他参数和属性与 b
 hex
 ~~~~~~~~~~~~~~~~
 
-hex() 方法可以以 16 进制字符串方式显示字节流对象：
+bytes.hex() 方法可以以 16 进制字符串方式显示字节流对象：
 
 .. code-block:: python
   :linenos:
@@ -1483,21 +1483,21 @@ hex() 方法可以以 16 进制字符串方式显示字节流对象：
   b'\xe4\xb8\xad\xe6\x96\x87'
   e4b8ade69687
   
-当然也可以将一个 16 进制字符串转换为 bytes 对象：
+当然使用 bytes.fromhex() 方法也可以将一个 16 进制字符串转换为 bytes 对象：
 
 .. code-block:: python
   :linenos:
   :lineno-start: 0
 
-  int0 = 0x12345678
-  hexstr = hex(int0)
+  int0 = 0xefefefef
+  hexstr = hex(int0)                 # 转字符串 0xefefefef
   print(hexstr)
   bytes0 = bytes.fromhex(hexstr[2:]) # 去除 0x 前缀
   print(bytes0)
   
   >>>
-  0x12345678
-  b'\x124Vx'  
+  0xefefefef
+  b'\xef\xef\xef\xef'
 
 bytes 和字符串转换
 ~~~~~~~~~~~~~~~~~~~~~~~~
