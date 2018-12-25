@@ -235,10 +235,12 @@ ORM 框架
 对象关系映射（ORM，Object Relational Mapping）通过使用描述对象和数据库之间映射的元数据，将程序中的对象操作自动关联到关系数据库中。
 ORM 是一种技术解决方案， Python 下提供了很多 ORM 的模块实现，如 peewee，Storm，SQLObject 和 SQLAlchemy。
 
+使用 ORM 操作数据库相当于增加了一个封装转换层，性能上会打折扣，要根据实际情况选择使用。
+
 peewee
 ~~~~~~~~~~~~~~~~
 
-peewee 是一个非常轻量级的 Python ORM 实现，它简便，非常易于上手。
+peewee 是一个非常轻量级的 Python ORM 实现，它提供类似著名的 Django Web 框架 API，非常易于上手。
 
 peewee 中定义了 Model 类，Field 和 Nodel 实例与数据库的映射关系如下：
 
@@ -265,7 +267,7 @@ Model 实例 表中的行
 
   db = SqliteDatabase('people.db')
   db.connect()  # 可选，无需显式连接数据库，但是要显式 close()
-          
+
   class Person(Model):
       name = TextField()       # Field 对应列
       age = IntegerField()
@@ -307,6 +309,30 @@ Model 实例 表中的行
   1 Grandma 60
   2 Grandpa 62
 
+如果我们定义 Person 类时指定主键，将不再自动生成 id，例如：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  class Person(Model):
+      name = TextField(primary_key=True)   # 指定 name 为主键
+      age = IntegerField()
+
+可以批量添加数据，只需要将参数集中在一个字典里：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  persons = {{name='Grandma', age=60}, {name='Grandpa', age=62}}
+  for args in persons:
+    Person.create(**args)
+
+  # 或
+  for args in persons:
+    Person(**args).save()
+
 采用 sqlite 查看建表语句和 person 表中的数据：
 
 .. code-block:: sh
@@ -321,7 +347,7 @@ Model 实例 表中的行
   1|Grandma|60
   2|Grandpa|62
 
-由于会自动生成 id ，所以我们在插入前需要判断当需要插入的数据是否存在。
+如果不指定主键，会自动生成 id ，我们在插入前需要判断当需要插入的数据是否存在。
 
 查询
 ``````````
@@ -522,3 +548,87 @@ Foreign Keys
 数据库使用完毕后应该显式关闭，也即  db.close()。
 
 更详细用法参考 `peewee 官方文档 <http://docs.peewee-orm.com/en/latest/index.html>`_ 。
+
+SQLAlchemy
+~~~~~~~~~~~~~~
+
+SQLAlchemy 是另一个著名的 Python ORM 模块，专为高效率和高性能的数据库访问设计的，代码比较复杂。Python 另一著名的轻量级 Web 框架 Flask 就基于 SQLAlchemy 实现了 flask-sqlaichemy ORM 模型。
+
+SQLAlchemy 的一大特点在于所有的数据库操作通过一个数据库 session 进行，在该session中控制每个对象的生命周期 。
+
+sqlalchemy数据类型
+````````````````````````````
+
+sqlalchemy 常用类型 和 Python 数据类型对照表：
+
+========== ================== ====
+数据类型    Python 类型       说明
+========== ================== ====
+Integer     int                 整形
+String      str                 字符串
+Float       float               浮点型
+DECIMAL     decimal.Decimal     定点型
+Boolean     bool                布尔型
+Enum        str                 枚举类型
+Text        str                 文本类型
+LongText    str                 长文本类型
+Date        datetime.date       日期
+DateTime    datetime.datetime 	日期和时间
+Time        datetime.time       时间
+========== ================== ====
+
+数据库操作
+```````````````````
+
+相对于 peewee，SQLAlchemy 操作数据库需要创建一个进行数据库操作的 session，它被称为工作单元，一个数据库对应一个 session，如果要进行多个数据库交互，就要创建多个 session，它实现了数据库之间的隔离。
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0 
+  
+  from sqlalchemy import create_engine,Column,String,Integer
+  from sqlalchemy.ext.declarative import declarative_base
+  from sqlalchemy.orm.session import sessionmaker
+  
+  # 创建对象的基类:
+  Base = declarative_base()
+  
+  # 定义Person对象
+  class Person(Base):
+      # 表名
+      __tablename__ = 'person'
+  
+      # 表结构
+      id = Column(Integer, primary_key=True , autoincrement=True)
+      name = Column(String(20))
+      age = Column(Integer)
+  
+  # 初始化数据库连接:
+  engine = create_engine('sqlite:///person.db')
+  
+  # 创建session对象:
+  session = sessionmaker(bind=engine)()
+  
+  # 创建表结构
+  Base.metadata.create_all(engine) 
+  
+  # 将实例对象添加到 session
+  session.add(Person(name='Grandma', age=60))
+  session.add(Person(name='Grandpa', age=62))
+  
+  # 提交到数据库
+  session.commit()
+  
+  # 关闭 session
+  session.close()
+
+这里我们指定自动生成 id，通过 sqlite 查看插入的数据：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0 
+  
+  sqlite> select * from person;
+  1|Grandma|60
+  2|Grandpa|62
+
