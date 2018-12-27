@@ -15,6 +15,7 @@ Python 从入门到深入
   01_print
   env
   string
+  regular
   list
   dict
   set
