@@ -46,15 +46,58 @@
 - `Graphviz 示例1 <https://graphs.grevian.org/example>`_
 - `Graphviz 示例2 <https://renenyffenegger.ch/notes/tools/Graphviz/examples/index>`_
 - `Graphviz 示例3 <http://www.tonyballantyne.com/graphs.html>`_
+- `Matplotlib 教程 <https://liam.page/2014/09/11/matplotlib-tutorial-zh-cn/>`_
+- `matplotlib 进阶和入门 <https://blog.csdn.net/qq_34337272/article/details/79555544>`_
 - `Pillow 图像处理 <https://pillow.readthedocs.io/en/5.3.x/>`_
 - `Turtle 绘图示例 <https://www.zhihu.com/question/271643290/answer/525019532>`_
+- `Matplotlib 用户指南 <https://wizardforcel.gitbooks.io/matplotlib-user-guide/>`_
 
-正则表达式
+符号和表达式
 --------------
 - `正则表达式 <http://deerchao.net/>`_
+- `常用数学符号的 LaTeX 表示方法 <http://www.mohu.org/info/symbols/symbols.htm>`_
+- `Math in reStructuredText <https://yuyuan.org/MathInreStructuredText/#use-mathjax-in-restructuredtext>`_
 
 RST语法参考
 ------------
+
+LaTeX数学表达式
+~~~~~~~~~~~~~~~~
+
+.. math::
+  
+  c^{2}=a^{2}+b^{2}
+  
+.. math::
+  
+  \ P(X=a|Y=b)=\frac{P(X=a,Y=b)}{P(Y=b)}
+ 
+.. role:: raw-latex(raw)
+    :format: latex html
+
+
+This: :raw-latex:`\((x+a)^3\)`
+
+this: :raw-latex:`\(W \approx \sum{f(x_k) \Delta x}\)`
+
+this: :raw-latex:`\(W = \int_{a}^{b}{f(x) dx}\)`
+
+:raw-latex:`\(\sqrt{x}\)`，不好处理
+
+and this:
+
+.. raw:: latex html
+
+   \[ \frac{1}{\Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{\frac25 \pi}} =
+   1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}} {1+\frac{e^{-6\pi}}
+   {1+\frac{e^{-8\pi}} {1+\ldots} } } } \]
+
+When :raw-latex:`\(a \ne 0\)`, there are two solutions to :raw-latex:`\(ax^2 + bx + c = 0\)` and they are
+:raw-latex:`\(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\)`
+
+
+其他语法
+~~~~~~~~~~~~
 
 | .. _my-reference-label0:
 | .. _nopara_decorator_class:

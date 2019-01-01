@@ -28,4 +28,6 @@ Python 从入门到深入
   decorator
   modules
   database
+  matplot
+  deeplearn
   appendix
