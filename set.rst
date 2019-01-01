@@ -79,7 +79,9 @@ set 非常类似 dict，只是没有 value，相当于 dict 的 key 集合。
   set() -> new empty set object
      set(iterable) -> new set object  
 
-注意在创建空集合的时候只能使用 `s = set()`，s = {} 将创建空字典。
+.. admonition:: 注意
+
+  在创建空集合的时候只能使用 `s = set()`，s = {} 将创建空字典。
 
 .. code-block:: python
   :linenos:
