@@ -297,12 +297,14 @@ Unicode码值转义
   >>>
   P n
 
+.. _strslice:
+
 切片取子字符串
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 通过提供起止索引来访问子字符串的方式称为切片。下标超过最大索引，或者起始索引大于终止索引，返回空字符串。
 
-切片操作支持指定步长，格式为 [索引:索引:步长]，前两个索引和普通切片一样。
+切片操作支持指定步长，格式为 [start:stop:step]，前两个索引和普通切片一样。
 
 .. code-block:: python
   :linenos:
@@ -321,6 +323,38 @@ Unicode码值转义
   456789
   45678
   0
+
+切片操作的步长可以为负数，常用于翻转字符串，此时如果不提供默认值 start 和 stop 则默认为尾部和头部索引：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  str0 = 'abcde'
+  print(str0[::-1])
+  print(str0[3::-2]) # 从[3]元素开始，逆序隔元素取值
+
+  >>>
+  edcba
+  db
+  
+切片操作等价于：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  def doslice(instr, start, stop, step):
+      newstr = ''
+  
+      for i in range(start, stop, step):
+          newstr += instr[i]
+      return newstr
+  
+  print(doslice(str0, 3, 0, -2))
+  
+  >>>
+  db
 
 过滤特定的字符
 ~~~~~~~~~~~~~~~~
