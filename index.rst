@@ -14,7 +14,7 @@ Python 从入门到深入
   :maxdepth: 2
   :numbered:
   
-  01_print
+  print
   env
   string
   regular
