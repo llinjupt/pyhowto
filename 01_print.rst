@@ -4,7 +4,9 @@
 直接打印输出
 -----------------
 
-print(value, ..., sep=' ', end='\n', file=sys.stdout, flush=False)
+::
+
+ print(value, ..., sep=' ', end='\n', file=sys.stdout, flush=False)
 
 print()内建函数用于打印输出，默认打印到标准输出 sys.stdout。
 
