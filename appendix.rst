@@ -75,7 +75,6 @@ LaTeX数学表达式
 .. role:: raw-latex(raw)
     :format: latex html
 
-
 This: :raw-latex:`\((x+a)^3\)`
 
 this: :raw-latex:`\(W \approx \sum{f(x_k) \Delta x}\)`
@@ -95,13 +94,17 @@ and this:
 When :raw-latex:`\(a \ne 0\)`, there are two solutions to :raw-latex:`\(ax^2 + bx + c = 0\)` and they are
 :raw-latex:`\(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\)`
 
-
 其他语法
 ~~~~~~~~~~~~
 
 | .. _my-reference-label0:
 | .. _nopara_decorator_class:
 | :ref:`nopara_decorator_class` 
+
+.. parsed-literal::
+
+     驱动器 C 中的卷是 系统专区
+     卷的序列号是 78E7-2220
 
 .. figure:: imgs/obj.png
   :scale: 100%

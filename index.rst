@@ -11,7 +11,7 @@ Python 从入门到深入
 .. toctree::
   :maxdepth: 2
   :numbered:
-
+  
   01_print
   env
   string
@@ -28,6 +28,4 @@ Python 从入门到深入
   decorator
   modules
   database
-  matplot
-  deeplearn
   appendix
