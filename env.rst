@@ -906,7 +906,19 @@ ipython 的交互提示符总是以 In [n]: 开始，其中 n 表示输入命令
 ipython 功能简介
 ~~~~~~~~~~~~~~~~~
 
-tab 键自动补全命令或者函数，极大提高开发效率：
+查看模块中所有函数，可以在 '.' 之后按 Tab 键：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  In [11]: np.random.[Tab]
+    absolute_import        bytes()                division               geometric()            info
+    bench()                chisquare()            exponential()          get_state()            laplace()
+    beta()                 choice()               f()                    gumbel()               Lock()                
+    binomial()             dirichlet()            gamma()                hypergeometric()       logistic()
+
+tab 键可以自动补全命令或者函数，极大提高开发效率：
 
 .. code-block:: sh
   :linenos:
@@ -990,16 +1002,18 @@ tab 键自动补全命令或者函数，极大提高开发效率：
   In [33]: %timeit sumto(100000)
   7.44 ms ± 361 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
+更多命令请使用 %quickref 和 %magic 来显示 IPython 快速参考。
+
 Jupyter Notebook
 -----------------
 
-Jupyter Notebook 的前身被称为 IPython notebook，是一个交互式的 web 应用程序，显然 Notebook 是笔记本的意思，可以将命令和结果记录为一个扩展名为 .ipynb 的文件，通过它非常方便创建和共享程序文档，支持实时代码，数学方程，可视化和 markdown 语法。
+Jupyter Notebook 的前身被称为 IPython notebook，是一个交互式的 web 应用程序，显然 Notebook 是笔记本的意思，可以将命令和结果记录为一个扩展名为 .ipynb 的文件，通过它非常方便创建和共享程序文档，支持数学方程，内嵌图片和 markdown 语法。
 
-Jupyter Notebook 建立在 IPython 基础之上，所以继承了 IPython 的强大扩展功能，并提供 web 服务器，所以访问它就要通过浏览器。
+Jupyter Notebook 建立在 IPython 基础之上，所以继承了 IPython 的强大扩展功能，是网页版的 IPython，所以访问它就要通过浏览器。
 
   # pip install jupyter
   # jupyter notebook # 启动命令  
   
 启动 jupyter notebook 之后在浏览器中输入 http://localhost:8888 即可。
 
- 
+如果我们在 github 或者其他网站发现一个 .ipynb，后者别人的 email 发来一个链接，我们想在线浏览该文件，可以通过 https://nbviewer.jupyter.org/ 网站，只要在页面的地址框填入 .ipynb 超链接即可。
