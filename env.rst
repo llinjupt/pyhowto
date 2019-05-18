@@ -868,17 +868,138 @@ cProfile数据可视化
 逐行分析模块line_profiler  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+ipython
+---------------
 
-Python环境配置
--------------------------
+ipython 是基于 Python 的交互式 shell，比默认的 python shell 强大很多：支持变量自动补全，自动缩进，支持 bash shell 命令，内置了许多很有用的功能和函数。
 
-为不同版本的 Python 环境安装模块
+ipython 安装非常简单，Windows 平台需额外安装 pyreadline 用于支持命令补全和颜色显示等功能：
 
-sudo pythonX.Y -m pip install module_name
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  # pip install ipython
+  # pip install pyreadline
 
-pip 安装软件报错：Python.h: No such file or directory的解决方法
+ipython 的交互提示符总是以 In [n]: 开始，其中 n 表示输入命令的编号：
 
-有两种情况，一种是没有Python.h这个文件，一种是Python的版本不对，
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+    
+  (py36) C:\Users\Red>ipython
+  Python 3.6.2 |Continuum Analytics, Inc.| (default, Jul 20 2017, 12:30:02) 
+  [MSC v.1900 64 bit (AMD64)]
+  Type 'copyright', 'credits' or 'license' for more information
+  IPython 6.1.0 -- An enhanced Interactive Python. Type '?' for help.
+  
+  In [1]:
 
-可以进入/usr/include/文件夹下的Pythonx.x文件夹里查找是否有Python.h这个文件。
-如果是第一种情况，那么需要安装python-dev这个包，(sudo apt-get install python-dev)。
+.. figure:: imgs/ipython.png
+  :scale: 50%
+  :align: center
+  :alt: Fucntion flow chart
+
+  ipython 功能列表（图自网络）
+
+ipython 功能简介
+~~~~~~~~~~~~~~~~~
+
+tab 键自动补全命令或者函数，极大提高开发效率：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  In [4]: %hist[Tab]
+                %hist
+                %history
+
+在变量的前面或后面添加问号(?)显示该对象的帮助信息，这就叫做对象的内省。这比 python 中的 help 命令方便多了：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+
+  # 查看 ? 自身的帮助信息
+  In [16]: ?
+  ......
+  ?         -> Introduction and overview of IPython's features (this screen).
+  object?   -> Details about 'object'.
+  object??  -> More detailed, verbose information about 'object'.
+  %quickref -> Quick reference of all IPython specific syntax and magics.
+  help      -> Access Python's own help system.
+
+?? 可显示更多信息，例如函数源码。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  In [21]: def test(a):
+      ...:     print(a)
+      ...:
+  
+  In [22]: test??
+  Signature: test(a)
+  Source:
+  def test(a):
+      print(a)
+  File:      c:\users\red\<ipython-input-21-e5cfd00ad69a>
+  Type:      function
+
+魔术命令是 ipython 的另一大特色：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  %quickref 显示IPython的快速参考
+  %magic 显示所有魔术命令的详细文档
+  %debug 从最新的异常跟踪的底部进入交互式调试器
+  %hist 打印命令的输入（可选输出）历史
+  %pdb 在异常发生后自动进入调试器
+  %paste 执行剪贴板中的Python代码
+  %cpaste 打开一个特殊提示符以便手工粘贴待执行的Python代码
+  %reset 删除interactive命名空间中的全部变量/名称
+  %page OBJECT 通过分页器打印输出OBJECT
+  %run script.py 在IPython中执行一个Python脚本文件
+  %prun statement 通过cProfile执行statement，并打印分析器的输出结果
+  %time statement 报告statement的执行时间
+  %timeit statement 多次执行statement以计算系综平均执行时间。对那些执行时  间非常小的代码很有用
+  %who、%who_ls、%whos 显示interactive命名空间中定义的变量，信息级别/冗余度可变
+  %xdel variable 删除variable，并尝试清除其在IPython中的对象上的一切引用
+
+%time 和 %timeit 是非常便利的测试代码执行时间的魔术命令，time 执行一次，而 timeit 执行多次取平均。
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  In [31]: def sumto(n):
+      ...:     sum = 0
+      ...:     for i in range(n+1):
+      ...:         sum += i
+      ...:     return sum
+
+  In [32]: %time sumto(100000)
+  Wall time: 6.98 ms
+  Out[32]: 5000050000
+  
+  In [33]: %timeit sumto(100000)
+  7.44 ms ± 361 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+Jupyter Notebook
+-----------------
+
+Jupyter Notebook 的前身被称为 IPython notebook，是一个交互式的 web 应用程序，显然 Notebook 是笔记本的意思，可以将命令和结果记录为一个笔记本，便于创建和共享程序文档，支持实时代码，数学方程，可视化和 markdown 语法。
+
+Jupyter Notebook 建立在 IPython 基础之上，所以继承了 IPython 的强大扩展功能，并提供 web 服务器，所以访问它就要通过浏览器。
+
+  # pip install jupyter
+  # jupyter notebook # 启动命令  
+  
+启动 jupyter notebook 之后在浏览器中输入 http://localhost:8888 即可。
+
+ 

@@ -8,14 +8,12 @@
 | [2] Micha Gorelick，Ian Ozsvald，胡世杰，徐旭彬(译).Python高性能编程[M].北京:人民邮电出版社，2017
 | [3] Jake VanderPlas，陈俊杰，陈小莉(译).Python数据科学手册[M].北京:人民邮电出版社，2017
 | [4] Mark Lutz. Learning Python(5th Edtion) [M] O’reilly Media Inc Gravenstein Highway North，2013
-| [5] Python Machine Learning （美）塞巴斯蒂安·拉施卡（Sebastian Raschka）[M].北京:机械工业出版社，2017
 
 参考网站
 -----------
 - `Python官方文档 <https://docs.python.org>`_ 
 - `Python 学习园<http://liao.cpython.org/scipy17/>`_
 - `廖雪峰 Python 教程 <https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000>`_
-- `机器学习 <https://thepythonguru.com/top-5-machine-learning-libraries-in-python/#more-1948>`_
 - `2to3版本代码转换工具 <https://bitbucket.org/python_mirrors/2to3>`_
 - `Python公开课 <https://python123.io>`_
 - `tutorialspoint代码示例 <http://www.tutorialspoint.com/python>`_
