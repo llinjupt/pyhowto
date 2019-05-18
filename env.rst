@@ -993,7 +993,7 @@ tab 键自动补全命令或者函数，极大提高开发效率：
 Jupyter Notebook
 -----------------
 
-Jupyter Notebook 的前身被称为 IPython notebook，是一个交互式的 web 应用程序，显然 Notebook 是笔记本的意思，可以将命令和结果记录为一个笔记本，便于创建和共享程序文档，支持实时代码，数学方程，可视化和 markdown 语法。
+Jupyter Notebook 的前身被称为 IPython notebook，是一个交互式的 web 应用程序，显然 Notebook 是笔记本的意思，可以将命令和结果记录为一个扩展名为 .ipynb 的文件，通过它非常方便创建和共享程序文档，支持实时代码，数学方程，可视化和 markdown 语法。
 
 Jupyter Notebook 建立在 IPython 基础之上，所以继承了 IPython 的强大扩展功能，并提供 web 服务器，所以访问它就要通过浏览器。
 
