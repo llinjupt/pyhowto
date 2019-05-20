@@ -513,7 +513,7 @@ sorted() 相对于列表自带的排序函数 L.sort() 具有以下特点：
   >>>
   ['a', 'Andrew', 'from', 'is', 'string', 'test', 'This']
 
-对于复杂对象，我们可以把元素中的部分成员最为排序关键字：
+对于复杂对象，我们可以把元素中的部分成员作为排序关键字：
   
 .. code-block:: python
   :linenos:
