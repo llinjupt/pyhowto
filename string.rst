@@ -181,7 +181,7 @@ Unicode码值转义
 
 在字符串中，我们可以使用 '\\x0d' 和 '\\r' 表示回车符号，那么对于中文字符来说，也同样有两种表示方式：
 
-.. code-block:: python
+.. code-block:: sh
   :linenos:
   :lineno-start: 0
 
@@ -423,8 +423,12 @@ filter(function or None, iterable) --> filter object
 如果只是在头部或者尾部追加，可以直接使用"+"拼接运算符实现。
 更复杂的操作需要通过替换函数等实现。
 
+.. _str_format:
+
 字符串格式化
 -----------------
+
+更多格式化输出请参考 :ref:`output_format` 。
 
 常用格式化符号
 ~~~~~~~~~~~~~~~~
@@ -1468,7 +1472,7 @@ bytes() 类支持以下参数来实例化一个字节流对象：
 
 bytes 对象具有 decode() 方法，将字节流转换回字符串：
 
-.. code-block:: python
+.. code-block:: sh
   :linenos:
   :lineno-start: 0
   
@@ -1538,7 +1542,7 @@ bytes 和字符串转换
 
 我们已经知道，str 对象编码后变为 bytes 对象，bytes 对象解码后对应 str 对象。
 
-.. code-block:: python
+.. code-block:: sh
   :linenos:
   :lineno-start: 0
   
