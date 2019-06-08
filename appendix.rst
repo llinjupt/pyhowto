@@ -30,6 +30,7 @@
 - `Python 函数模块实例 <https://www.journaldev.com/python>`_
 - `Python3.0 简史 <https://www.cnblogs.com/animalize/p/5633215.html>`_
 - `Module of the Week <https://pymotw.com/3/>`_
+- `开源手册大全 <http://manual.51yip.com/>`
 
 数据编码
 --------------
