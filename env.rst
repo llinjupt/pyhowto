@@ -1015,8 +1015,8 @@ Jupyter Notebook 建立在 IPython 基础之上，所以继承了 IPython 的强
   :linenos:
   :lineno-start: 0
   
-  # pip install jupyter
-  # jupyter notebook # 启动命令  
+  $ pip install jupyter
+  $ jupyter notebook # 启动命令  
 
 启动 jupyter notebook 之后在浏览器中输入 http://localhost:8888 即可。
 
