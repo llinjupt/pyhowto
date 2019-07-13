@@ -13,7 +13,8 @@ Python 从入门到深入
 .. toctree::
   :maxdepth: 2
   :numbered:
-  
+   
+  install 
   print
   env
   string

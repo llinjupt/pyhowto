@@ -162,6 +162,37 @@ virtualenv 默认使用系统中的 python 创建系统环境，使用 python -V
 
 virtualenv 在创建独立虚拟运行环境时把指定的 python 命令和它依赖的库文件复制一份到当前虚拟环境， 命令 source tfenv/bin/activate 会修改相关环境变量，此时交互 shell 中的 PATH 等环境变量指向了当前虚拟环境所在路径，所以 python 和 pip 也指向当前的虚拟环境。
 
+安装编译环境
+~~~~~~~~~~~~~~~~
+
+有些第三方安装包在安装前需要编译，否则安装时将提示找不到 Python.h，例如：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  ...
+  # include <Python.h>
+                       ^
+  compilation terminated.
+  error: command 'i686-linux-gnu-gcc' failed with exit status 1
+
+安装对应编译器的头文件和库文件命令：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  $ sudo apt-get install python3.6-dev
+  Reading package lists... Done
+  Building dependency tree       
+  Reading state information... Done
+  The following extra packages will be installed:
+    libpython3.6 libpython3.6-dev
+  ...
+
+此时应该指定对应的 Python 版本，例如 python3.6-dev 和  python2.7-dev。
+ 
 pip 管理软件包
 ---------------
 
