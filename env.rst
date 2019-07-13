@@ -1011,9 +1011,13 @@ Jupyter Notebook 的前身被称为 IPython notebook，是一个交互式的 web
 
 Jupyter Notebook 建立在 IPython 基础之上，所以继承了 IPython 的强大扩展功能，是网页版的 IPython，所以访问它就要通过浏览器。
 
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
   # pip install jupyter
   # jupyter notebook # 启动命令  
-  
+
 启动 jupyter notebook 之后在浏览器中输入 http://localhost:8888 即可。
 
-如果我们在 github 或者其他网站发现一个 .ipynb，后者别人的 email 发来一个链接，我们想在线浏览该文件，可以通过 https://nbviewer.jupyter.org/ 网站，只要在页面的地址框填入 .ipynb 超链接即可。
+如果我们在 github 或者其他网站发现一个 .ipynb，或者 email 中发来嵌入一条链接，我们想在线浏览该文件，可以通过 https://nbviewer.jupyter.org/ 网站实现：只要在页面的地址框填入 .ipynb 超链接即可。
