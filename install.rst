@@ -177,7 +177,7 @@ virtualenv 在创建独立虚拟运行环境时把指定的 python 命令和它�
   compilation terminated.
   error: command 'i686-linux-gnu-gcc' failed with exit status 1
 
-安装对应编译器的头文件和库文件命令：
+安装对应编译环境的头文件和库文件命令：
 
 .. code-block:: sh
   :linenos:
