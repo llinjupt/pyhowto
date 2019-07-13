@@ -191,7 +191,7 @@ virtualenv 在创建独立虚拟运行环境时把指定的 python 命令和它�
     libpython3.6 libpython3.6-dev
   ...
 
-此时应该指定对应的 Python 版本，例如 python3.6-dev 和  python2.7-dev。
+安装时应指定对应的 Python 版本，例如 python3.6-dev 或 python2.7-dev。
  
 pip 管理软件包
 ---------------
