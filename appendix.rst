@@ -12,7 +12,7 @@
 参考网站
 -----------
 - `Python官方文档 <https://docs.python.org>`_ 
-- `Python 学习园<http://liao.cpython.org/scipy17/>`_
+- `Python 学习园 <http://liao.cpython.org/scipy17/>`_
 - `廖雪峰 Python 教程 <https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000>`_
 - `2to3版本代码转换工具 <https://bitbucket.org/python_mirrors/2to3>`_
 - `Python公开课 <https://python123.io>`_
