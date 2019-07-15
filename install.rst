@@ -247,6 +247,7 @@ pip 安装时会打印出下载的软件包的路径，此时使用 wget 或者�
   :linenos:
   :lineno-start: 0
   
+  # 或者 pip install -U pip
   $ pip install --upgrade pip
 
 pip 卸载软件包
@@ -293,3 +294,43 @@ pip show 查看单个软件包信息，包含版本，官网，作者，发布�
   Location: /usr/local/lib/python3.6/dist-packages
   Requires: 
   Required-by: requests, pyppeteer
+
+查看 pip 帮助
+~~~~~~~~~~~~~~~
+
+普通的 linux 命令使用 man cmd 查看帮助信息，但是 pip 是 python 脚本，查看帮助信息方式为：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  # 或者 pip --help
+  $ pip -h
+
+  Usage:   
+    pip <command> [options]
+  
+  Commands:
+    install                     Install packages.
+    download                    Download packages.
+    uninstall                   Uninstall packages.
+    freeze                      Output installed packages in requirements format.
+    list                        List installed packages.
+    ...
+
+也可以针对单个命令字查看它支持的选项，例如：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  $ pip install -h
+
+  Usage:   
+    pip install [options] <requirement specifier> [package-index-options] ...
+    pip install [options] -r <requirements file> [package-index-options] ...
+    pip install [options] [-e] <vcs project url> ...
+    pip install [options] [-e] <local project path> ...
+    pip install [options] <archive url/path> ...
+    ...
+
