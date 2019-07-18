@@ -142,8 +142,9 @@ time.gmtime() 和 time.localtime() 可以接受一个时间戳为参数，如果
   :linenos:
   :lineno-start: 0
   
+  # 以下两种方式是等价的
   print(time.ctime())
-  print(time.asctime(time.localtime())) # 与 time.ctime() 等价
+  print(time.asctime(time.localtime()))
   
   print(time.ctime(0))
   
@@ -228,8 +229,8 @@ Python 中常用的时间格式化符号如下所示：
 
 时间字符串无法直接转换为时间戳，需要先转换为9元组。下图以更清晰的方式展现了它们之间的转换关系。
 
-.. figure:: imgs/time_convert.jpg
-  :scale: 90%
+.. figure:: imgs/time_convert.png
+  :scale: 50%
   :align: center
   :alt: Time convert chart
 
