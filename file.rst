@@ -62,15 +62,73 @@ Python 提供了强大的文件操作方法。操作系统不允许用户程序�
 如果是进行文本编辑，那么应该使用默认的文本打开模式，如果是多媒体等格式的文件就要使用二进制模式，以保证读取和写入的数据是一致的。
 参见 `Windows 上的 fopen 手册 <https://docs.microsoft.com/zh-cn/cpp/c-runtime-library/reference/fopen-wfopen?view=vs-2017>`_。
 
-指定打开文件编码
-~~~~~~~~~~~~~~~~~
-
-在类 Unix 系统上这两种模式是等价的，遵循 POSIX 标准的 C 库函数不会对数据进行任何转换，而把这些处理交给了用户空间的编辑器。
+在类 Unix 系统上这两种模式是等价的，也即均为 'b' 模式，遵循 POSIX 标准的 C 库函数不会对数据进行任何转换，而把这些处理交给用户空间的编辑器。
 
 ::
   
-  open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
+  open(file, mode='r', buffering=-1, encoding=None, errors=None, 
+       newline=None, closefd=True, opener=None)
       Open file and return a stream.  Raise IOError upon failure.
+
+在 Python 中，和 c 接口中的意义有所不同，只有 'b' 模式，且并不作为转换模式使用，而是指定参数的类型：指定了 'b' 模式，那么写入参数必须是 bytes 类型，同样读取返回的也是 bytes 类型：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  # 'b' 模式中，write 参数必须是 bytes 类型的
+  with open('test.txt', 'wb') as fw:
+    fw.write('一abc')
+    
+    # 正确写入方式为
+    # fw.write(bytes('一abc', encoding='utf-8'))
+    
+  >>>
+  TypeError: a bytes-like object is required, not 'str'
+
+同样读取时如果指定了 'b' 模式，则返回 bytes 类型：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  with open('wb.txt', 'rb') as fr:
+    print(fr.read())
+  
+  >>>
+  b'\xe4\xb8\x80abc'
+
+通常对文件操作时应该明确指定编码格式，例如：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  def test_file_encode():
+    with open('wb.txt', 'w', encoding='utf-8') as fw:
+      fw.write('一abc') # 非 'b' 模式可以直接写入字符串
+
+    # 如果此处打开模式为 'rb' 则 fr.read() 返回 bytes 类型
+    with open('wb.txt', 'r', encoding='utf-8') as fr:
+      print(fr.read()) # 自动使用 encoding 参数进行解码
+
+  test_file_encode()
+  
+  >>>
+  一abc
+
+可以通过 hexdump 查看写出的文件内容：
+
+.. code-block:: sh
+  :linenos:
+  :lineno-start: 0
+  
+  # hexdump 查看写出文件，可以发现前三个字节为 '一' 的 unicode 码值的 utf-8 编码 
+  $ hexdump -C wb.txt 
+  00000000  e4 b8 80 61 62 63                                 |...abc|
+
+指定文件编码
+~~~~~~~~~~~~~~~
 
 open() 函数实现文件的打开，它返回一个文件描述符，在 Python 里它是一个文件对象。
 
@@ -89,7 +147,7 @@ open() 函数实现文件的打开，它返回一个文件描述符，在 Python
   <_io.TextIOWrapper name='test.txt' mode='r' encoding='UTF-8'>
 
 这里之所以打印文件对象，是要查看编码，发现在不同的平台上它的值是不同的，该参数可以在打开文件时指定，如果不指定，则使用 locale.getpreferredencoding() 获取。
-它用于文本模式时如何解码读取的文件数据，或者如何编码写入到文件。
+它用于文本模式时如何解码读取的文件数据，或者如何编码写入到文件。关于编码格式参考 :ref:`general_encode` 。
 
 .. code-block:: python
   :linenos:
