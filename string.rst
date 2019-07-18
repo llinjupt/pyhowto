@@ -1613,6 +1613,13 @@ bytes 和字符串转换
 
 bytes() 中的编码意为对参数进行编码得到 bytes 对象，str() 中的编码参数意为第一个参数是 bytes 类型的 buffer，编码参数指定了它的解码，在 str() 函数内部使用它对 buffer 进行解码得到 str 对象。
 
+.. figure:: imgs/bsconvert.png
+  :scale: 50%
+  :align: center
+  :alt: encodes
+
+  字符串和字节序列转换
+
 类字符串操作
 ~~~~~~~~~~~~~~
 
