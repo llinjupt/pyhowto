@@ -1286,6 +1286,13 @@ isnumeric() 在unicode空间上要宽泛得多。
 - GBK(cp936)：“国标”、“扩展”汉语拼音的第一个字母缩写，2字节编码。扩展了GB2312编码，完全兼容GB2312，包含繁体字符，但是不兼容BIG5 (所以BIG5编码的文档采用GBK打开是乱码，GB2312采用GBK打开可以正常浏览)
 - Unicode(统一码/万国码/单一码)：全球通用的单一字符集，包含人类迄今使用的所有字符，但只规定了符号的编码值，没有规定计算机如何编码和存储，针对Unicode有两种编码方案。
 
+.. figure:: imgs/encodes.png
+  :scale: 50%
+  :align: center
+  :alt: encodes
+  
+  常见编码关系图
+
 Unicode编码方案主要有两条主线：UCS和UTF。
 
 - UCS(Universal Character Set)：由ISO/IEC标准组织维护管理，包含两种编码方案
@@ -1384,6 +1391,33 @@ Python3 中明确区分字符串类型 (str) 和 字节序列类型 (bytes)，�
 
 Python 对 bytes 类型的数据用带 b 前缀加字符串（如果字节值在 ascii 码值内则显示对应的 ascii 字符，否则显示 \\\x 表示的16进制字节值）表示。
 
+我们可以通过 b'xxx' 显式定义一个 bytes 类型对象，例如：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+
+  bytes0 = b'abc'
+  print(type(bytes0).__name__)
+  
+  >>>
+  bytes
+
+同样可以使用字符串对象的 encode 函数得到 bytes 对象：
+
+.. code-block:: python
+  :linenos:
+  :lineno-start: 0
+  
+  # 默认编码方式即为 utf-8
+  bytes0 = 'abc'.encode('utf-8')
+  print(bytes0)
+  
+  >>>
+  b'abc'
+
+也可以通过 bytes 类名把字符串类型转换为 bytes 对象：
+  
 .. code-block:: python
   :linenos:
   :lineno-start: 0
@@ -1470,8 +1504,8 @@ bytes() 类支持以下参数来实例化一个字节流对象：
   
   print(bytes()) # 等价于 bytes(0)
   
-  # 等价于 print('string'.encode('utf-8'))
-  # 等价于 print(bytes('string', 'utf-8')
+  # 以下两种方式是等价的，对字符串进行编码得到 bytes 对象
+  # print('string'.encode('utf-8'))
   print(bytes('string', encoding='utf-8')) 
   
   print(bytes(3))
@@ -1568,15 +1602,16 @@ bytes 和字符串转换
   bytes1 = '中文'.encode('utf-8')
   print(bytes0, bytes1)
   
+  # 以下两种方式是等价的：对 bytes 对象解码得到字符串
+  # str1 = str(bytes1, 'utf-8')
   str0 = bytes0.decode('utf-8')
-  str1 = str(bytes1, 'utf-8')
   print(str0, str1)
   
   >>>
   b'\xe4\xb8\xad\xe6\x96\x87' b'\xe4\xb8\xad\xe6\x96\x87'
-  中文 中文
+  中文
 
-bytes() 中的编码意为对参数进行编码得到 bytes 对象，str() 中的编码意为对参数进行解码得到 str 对象。
+bytes() 中的编码意为对参数进行编码得到 bytes 对象，str() 中的编码参数意为第一个参数是 bytes 类型的 buffer，编码参数指定了它的解码，在 str() 函数内部使用它对 buffer 进行解码得到 str 对象。
 
 类字符串操作
 ~~~~~~~~~~~~~~
