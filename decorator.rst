@@ -1703,15 +1703,15 @@ functools 模块中的 wraps 可以帮助保留这些信息。functools.wraps �
           self.__arg = 0
       
       @property
-      def argopt(self):
+      def arg(self):
           return self.__arg
       
-      @argopt.setter
-      def argopt(self, value):
+      @arg.setter
+      def arg(self, value):
           self.__arg = value
       
-      @argopt.deleter
-      def argopt(self):
+      @arg.deleter
+      def arg(self):
           del self.__arg
   
   c = C()
